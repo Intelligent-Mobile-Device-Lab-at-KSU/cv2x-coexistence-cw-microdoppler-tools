@@ -1,4 +1,4 @@
-# narrowband_paper/
+# narrowband/
 
 Multi-subcarrier CW transceiver for the narrowband paper study.
 Separate project from the hopped-CW work in `../uncoordinatedpaper/`.
