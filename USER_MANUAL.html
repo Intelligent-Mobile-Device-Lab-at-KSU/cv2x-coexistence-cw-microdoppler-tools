@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VTC Fall 2026 Workshop — Tools User Manual</title>
+<style>
+  :root {
+    --bg: #fdfdfd;
+    --fg: #1a1a1a;
+    --muted: #586069;
+    --accent: #2a5aa0;
+    --accent-soft: #eaf1fb;
+    --border: #e1e4e8;
+    --code-bg: #1e1e2e;
+    --code-fg: #e6e6f0;
+    --code-comment: #8a8aa8;
+    --code-flag: #f5c06c;
+    --code-string: #a3e9a4;
+    --tip-bg: #e8f1fc;
+    --tip-border: #1976d2;
+    --warn-bg: #fff7e0;
+    --warn-border: #d18e15;
+    --bad-bg: #fde8e8;
+    --bad-border: #c62828;
+    --good-bg: #e8f5e9;
+    --good-border: #388e3c;
+    --sidebar-w: 270px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  header.topbar h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  header.topbar .tag {
+    font-size: 12px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2px 8px;
+  }
+  header.topbar .menu-toggle {
+    display: none;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    padding: 4px 10px;
+    font-size: 18px;
+    border-radius: 4px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    min-height: calc(100vh - 44px);
+  }
+
+  nav.sidebar {
+    position: sticky;
+    top: 44px;
+    align-self: start;
+    height: calc(100vh - 44px);
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    background: #fafbfc;
+    padding: 18px 14px 40px;
+    font-size: 13.5px;
+  }
+  nav.sidebar h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 18px 0 6px;
+    padding-left: 4px;
+  }
+  nav.sidebar ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  nav.sidebar ol li a {
+    display: block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--fg);
+    border-left: 2px solid transparent;
+  }
+  nav.sidebar ol li a:hover {
+    background: var(--accent-soft);
+    text-decoration: none;
+  }
+  nav.sidebar ol li a.active {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  nav.sidebar ol ol {
+    margin-left: 12px;
+    border-left: 1px dotted var(--border);
+    padding-left: 6px;
+  }
+  nav.sidebar ol ol li a { font-size: 12.5px; color: var(--muted); }
+
+  main {
+    padding: 28px 40px 120px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  main h1, main h2, main h3, main h4 {
+    line-height: 1.3;
+    scroll-margin-top: 60px;
+  }
+  main h1 { font-size: 28px; margin: 18px 0 8px; }
+  main h2 {
+    font-size: 22px;
+    margin: 36px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  main h3 { font-size: 17px; margin: 22px 0 6px; color: var(--accent); }
+  main h4 { font-size: 14.5px; margin: 14px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  main p { margin: 8px 0 14px; }
+  main ul, main ol { padding-left: 22px; }
+  main li { margin: 3px 0; }
+
+  code, kbd, samp, pre {
+    font-family: "SF Mono", "Consolas", "Menlo", "Monaco", monospace;
+    font-size: 13px;
+  }
+  p code, li code, td code {
+    background: #f1f3f6;
+    border: 1px solid var(--border);
+    padding: 0 5px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+
+  pre.code {
+    position: relative;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border-radius: 6px;
+    padding: 14px 60px 14px 16px;
+    overflow-x: auto;
+    line-height: 1.55;
+    font-size: 12.8px;
+    margin: 10px 0 16px;
+  }
+  pre.code .flag { color: var(--code-flag); }
+  pre.code .str  { color: var(--code-string); }
+  pre.code .cmt  { color: var(--code-comment); font-style: italic; }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #3a3a52;
+    color: #fff;
+    border: 0;
+    border-radius: 4px;
+    padding: 3px 9px;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0.78;
+    transition: opacity 0.15s;
+  }
+  .copy-btn:hover { opacity: 1; }
+  .copy-btn.copied { background: #2f7f3f; }
+
+  table.grid {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0 18px;
+    font-size: 13.5px;
+  }
+  table.grid th, table.grid td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.grid th {
+    background: #f4f6fa;
+    font-weight: 600;
+  }
+  table.grid tr:nth-child(even) td { background: #fafbfc; }
+
+  .callout {
+    border-left: 4px solid;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .callout p:first-child { margin-top: 0; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .tag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 6px;
+  }
+  .tip     { background: var(--tip-bg);  border-color: var(--tip-border); }
+  .tip     .tag { color: var(--tip-border); }
+  .warn    { background: var(--warn-bg); border-color: var(--warn-border); }
+  .warn    .tag { color: var(--warn-border); }
+  .bad     { background: var(--bad-bg);  border-color: var(--bad-border); }
+  .bad     .tag { color: var(--bad-border); }
+  .good    { background: var(--good-bg); border-color: var(--good-border); }
+  .good    .tag { color: var(--good-border); }
+
+  details.flags {
+    margin: 10px 0 18px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fafbfc;
+    padding: 0;
+  }
+  details.flags summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--accent);
+    user-select: none;
+  }
+  details.flags[open] summary { border-bottom: 1px solid var(--border); }
+  details.flags table.grid { margin: 0; border: 0; }
+  details.flags table.grid th,
+  details.flags table.grid td { border-left: 0; border-right: 0; }
+
+  pre.tree {
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .back-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    background: var(--accent);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-size: 18px;
+    text-decoration: none;
+    z-index: 15;
+  }
+  .back-top.visible { opacity: 0.85; pointer-events: auto; }
+  .back-top:hover { opacity: 1; text-decoration: none; }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    letter-spacing: 0.04em;
+  }
+  .pill-current  { background: var(--good-bg); color: var(--good-border); }
+  .pill-archived { background: var(--bad-bg);  color: var(--bad-border); }
+  .pill-missing  { background: var(--warn-bg); color: var(--warn-border); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.sidebar {
+      position: fixed;
+      top: 44px;
+      left: 0;
+      bottom: 0;
+      width: 260px;
+      transform: translateX(-100%);
+      transition: transform 0.2s;
+      z-index: 18;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    }
+    nav.sidebar.open { transform: translateX(0); }
+    header.topbar .menu-toggle { display: inline-block; }
+    main { padding: 20px 18px 80px; }
+  }
+
+  @media print {
+    header.topbar, nav.sidebar, .back-top, .copy-btn { display: none !important; }
+    .layout { display: block; }
+    main { padding: 0; max-width: none; }
+    pre.code { background: #f2f2f2; color: #111; border: 1px solid #ccc; }
+    pre.code .flag, pre.code .str, pre.code .cmt { color: #333; }
+    a { color: #000; }
+    h2, h3 { page-break-after: avoid; }
+    pre.code, table.grid, .callout { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="menu-toggle" aria-label="Toggle menu">&#9776;</button>
+  <h1>VTC Fall 2026 — Tools User Manual</h1>
+  <span class="tag">Hopped-CW &middot; C-V2X &middot; Narrowband</span>
+</header>
+
+<div class="layout">
+
+<nav class="sidebar" id="sidebar">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#welcome">1. Welcome</a></li>
+    <li><a href="#prereqs">2. Prerequisites</a></li>
+    <li><a href="#repo-map">3. Repo map</a></li>
+    <li><a href="#glossary">4. Core concepts</a></li>
+    <li><a href="#w0-sim">5. Workflow&nbsp;0 — Simulator</a>
+      <ol>
+        <li><a href="#sim-learning-path">Learning path</a></li>
+        <li><a href="#sim-common">Common sim workflows</a></li>
+      </ol>
+    </li>
+    <li><a href="#w1-hopped">6. Workflow&nbsp;1 — Hopped-CW HW</a>
+      <ol>
+        <li><a href="#w1-capture">1a. TX/RX capture</a></li>
+        <li><a href="#w1-sanity">1b. Sanity check</a></li>
+        <li><a href="#w1-viewer">1c. Interactive viewer</a></li>
+        <li><a href="#w1-batch">1d. Batch export</a></li>
+        <li><a href="#w1-chain">Processing chain</a></li>
+      </ol>
+    </li>
+    <li><a href="#w2-cv2x">7. Workflow&nbsp;2 — C-V2X replay</a></li>
+    <li><a href="#w3-virtsense">8. Workflow&nbsp;3 — CW virtual sensing</a></li>
+    <li><a href="#w4-narrow">9. Workflow&nbsp;4 — Narrowband comb</a></li>
+    <li><a href="#live">10. Live monitoring</a></li>
+    <li><a href="#config-ref">11. Config file reference</a></li>
+    <li><a href="#file-formats">12. File &amp; sidecar formats</a></li>
+    <li><a href="#archived">13. Archived commands</a></li>
+    <li><a href="#troubleshooting">14. Troubleshooting</a></li>
+    <li><a href="#golden-path">15. First experiment checklist</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ============================= 1. WELCOME ============================= -->
+<section id="welcome">
+  <h1>VTC Fall 2026 Workshop &mdash; Tools User Manual</h1>
+  <p>
+    Welcome. This manual walks you through every tool in the
+    <code>TOOLS_FOR_VTC_FALL_2026_WORKSHOP/</code> directory, from
+    &ldquo;I have never touched this repo&rdquo; to &ldquo;I have a published-quality
+    micro-Doppler spectrogram on disk.&rdquo; It is written to be followed cold by
+    a student or collaborator who has never seen the code before.
+  </p>
+
+  <h2 id="what-for">What these tools do</h2>
+  <p>
+    Three complementary radio-frequency (RF) sensing pipelines, all implemented
+    in Python on top of GNU Radio and UHD, targeting a USRP X310 at 5.9 GHz:
+  </p>
+  <ol>
+    <li>
+      <strong>Hopped-CW micro-Doppler sensing.</strong> A single continuous-wave
+      (CW) tone hops rapidly among four frequencies. After de-hopping on the
+      receiver, the tone lands at DC and a short-time Fourier transform (STFT)
+      yields a micro-Doppler spectrogram of whatever is moving in front of the
+      antenna (a rotating panel, a walking pedestrian, a passing vehicle).
+      Lives in
+      <code>multihop_and_cv2x_over_the_air_spectrogram_px/</code>.
+    </li>
+    <li>
+      <strong>C-V2X over-the-air capture, replay, and CW virtual sensing.</strong>
+      Capture a real 3GPP Rel-14 C-V2X sidelink transmission, optionally inject
+      a narrow CW sensing tone between data subcarriers, replay it
+      GPSDO/DFN-aligned so a commercial radio still decodes the C-V2X data,
+      and simultaneously extract micro-Doppler from the CW return. Lives in
+      <code>multihop_and_cv2x_over_the_air_spectrogram_px/overtheair/</code>.
+    </li>
+    <li>
+      <strong>Narrowband multi-subcarrier CW transceiver.</strong> A comb of
+      <em>N</em> parallel CW tones symmetric around DC, with a live QT FFT
+      display of both TX and RX. Separate paper, simpler signal, good for
+      classroom demos. Lives in <code>narrowband_paper/</code>.
+    </li>
+  </ol>
+  <p>
+    A pure-Python simulator
+    (<code>multihop_and_cv2x_over_the_air_spectrogram_px/simulator/</code>)
+    reproduces the hopped-CW chain with no hardware, so you can validate
+    changes, tune parameters, and regression-test before ever touching a USRP.
+  </p>
+
+  <h2 id="which-workflow">Which workflow should I use?</h2>
+  <table class="grid">
+    <thead>
+      <tr><th>Goal</th><th>Workflow</th><th>Section</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Learn the pipeline with no hardware</td>
+        <td>Simulator first</td>
+        <td><a href="#w0-sim">&sect;5</a></td>
+      </tr>
+      <tr>
+        <td>Produce a clean micro-Doppler spectrogram on hardware (no coexistence)</td>
+        <td>Hopped-CW on USRP X310</td>
+        <td><a href="#w1-hopped">&sect;6</a></td>
+      </tr>
+      <tr>
+        <td>Record and replay a real C-V2X transmission</td>
+        <td>C-V2X capture / replay</td>
+        <td><a href="#w2-cv2x">&sect;7</a></td>
+      </tr>
+      <tr>
+        <td>Micro-Doppler sensing <em>while</em> carrying real C-V2X data</td>
+        <td>C-V2X + CW virtual sensing</td>
+        <td><a href="#w3-virtsense">&sect;8</a></td>
+      </tr>
+      <tr>
+        <td>Classroom-friendly tonal comb with live FFT</td>
+        <td>Narrowband <code>mc.py</code></td>
+        <td><a href="#w4-narrow">&sect;9</a></td>
+      </tr>
+      <tr>
+        <td>Real-time eyeball feedback while aiming the antenna</td>
+        <td>Live 3-panel monitor</td>
+        <td><a href="#live">&sect;10</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout good">
+    <p><span class="tag">Recommended starting point</span>
+      If this is your first time, jump to <a href="#golden-path">&sect;15 &mdash;
+      First experiment checklist</a> and follow it top to bottom. It links back
+      into the deeper sections as needed.</p>
+  </div>
+</section>
+
+<!-- ============================= 2. PREREQUISITES ============================= -->
+<section id="prereqs">
+  <h2>2. Hardware and software prerequisites</h2>
+
+  <h3>Hardware</h3>
+  <ul>
+    <li>
+      <strong>USRP X310</strong> with two SBX daughtercards (or a comparable
+      dual-channel setup). Radio #0 / subdev <code>A:0</code> handles TX at
+      30.72 MSps (the full 20 MHz C-V2X channel), radio #1 / subdev
+      <code>B:0</code> handles narrow-band RX at roughly 192 kSps for the
+      over-the-air CW return.
+    </li>
+    <li>
+      <strong>GPSDO</strong> supplying 10 MHz reference, 1 PPS, and GNSS time
+      to the X310. The C-V2X replay pipeline is not optional: both capture and
+      replay need GPS-disciplined time.
+    </li>
+    <li>
+      A <strong>commercial C-V2X radio</strong> (an OBU or RSU under test) on
+      the same RF channel, if you want to verify that injected CW tones do not
+      break PHY decoding.
+    </li>
+  </ul>
+
+  <h3>Software</h3>
+  <ul>
+    <li><strong>radioconda</strong> (or equivalent) with GNU Radio &ge; 3.9.</li>
+    <li><strong>UHD 4.x with RFNoC</strong> — required for the FPGA-DRAM replay path (<code>cv2x_rfnoc_replay.py</code>).</li>
+    <li>Python packages: <code>numpy</code>, <code>scipy</code>, <code>matplotlib</code> with a <code>TkAgg</code>-capable backend, and <code>PyQt5</code> (for <code>mc.py</code>'s QT FFT sink).</li>
+  </ul>
+
+  <h3>Verifying the USRP and GPSDO</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>uhd_usrp_probe <span class="flag">--args</span> <span class="str">"type=x300"</span></pre>
+  <p>
+    Confirm that the GPSDO locks (sensors report <code>gps_locked: true</code>
+    and <code>ref_locked: true</code>) before running any <code>--gpsdo</code>
+    capture or replay. If the probe fails, scripts that query GPSDO sensors
+    will fail too.
+  </p>
+
+  <h3>Why every command mentions a serial number</h3>
+  <p>
+    You will see the string
+    <code>serial=33767A5,master_clock_rate=184.32e6</code> repeated throughout
+    this manual and in <code>ALL COMMANDS FOR PAPERS - ANNOTATED.txt</code>.
+    That is the serial of the specific X310 these commands were developed on,
+    and <em>184.32 MHz</em> is the master clock rate that lets the X310
+    cleanly decimate down to 30.72 MSps (exactly one-sixth of 184.32 MHz).
+  </p>
+  <p>
+    Replace the serial with your own X310's serial (<code>uhd_find_devices</code>
+    will print it). Keep the <code>master_clock_rate</code> value unless you
+    know you want a different one.
+  </p>
+
+  <div class="callout tip">
+    <p><span class="tag">Tip</span>
+      On Windows, the shell path to radioconda's Python typically looks like
+      <code>C:\Users\billy\radioconda\python.exe</code>. You can call it
+      directly instead of relying on <code>PATH</code>: for example
+      <code>C:\Users\billy\radioconda\python.exe cwhop_tx.py ...</code>. This
+      avoids conflicts with any other Python installation.</p>
+  </div>
+</section>
+
+<!-- ============================= 3. REPO MAP ============================= -->
+<section id="repo-map">
+  <h2>3. Repo map</h2>
+  <p>An annotated layout of everything under <code>TOOLS_FOR_VTC_FALL_2026_WORKSHOP/</code>:</p>
+  <pre class="tree">TOOLS_FOR_VTC_FALL_2026_WORKSHOP/
+&#9474;
+&#9500;&#9472; ALL COMMANDS FOR PAPERS - ANNOTATED.txt    Copy-paste command reference, grouped by workflow
+&#9474;
+&#9500;&#9472; multihop_and_cv2x_over_the_air_spectrogram_px/
+&#9474;   &#9500;&#9472; README.md                             Top-level hopped-CW pipeline README
+&#9474;   &#9500;&#9472; cwhop_tx.py                           TX+RX capture: phase-continuous hopped CW, GPSDO-scheduled
+&#9474;   &#9500;&#9472; cwhop_rx.py                           Batch processor: de-hop -&gt; FIR decimate -&gt; STFT -&gt; PNG/NPZ
+&#9474;   &#9500;&#9472; cwhop_viewer.py                       Interactive spectrogram viewer with live sliders
+&#9474;   &#9500;&#9472; tx_sanity.py                          Hop-aware sanity spectrogram; cyan schedule overlay
+&#9474;   &#9500;&#9472; iq_spectrogram.py                     Generic .cf32/.bin IQ spectrogram (hop-agnostic)
+&#9474;   &#9500;&#9472; cv2x_microdoppler_cw2.py              Real-time 3-panel live monitor (single static CW, no offline output)
+&#9474;   &#9500;&#9472; cwhopping_config_POST.json            Tuned config for the published result (70 ms hann, 80%, +/-500 Hz)
+&#9474;   &#9474;
+&#9474;   &#9500;&#9472; simulator/                            Pure-Python pipeline, no hardware
+&#9474;   &#9474;   &#9500;&#9472; README.md
+&#9474;   &#9474;   &#9500;&#9472; cwhopping_explorer.py             Tabbed GUI with sliders for every parameter
+&#9474;   &#9474;   &#9500;&#9472; test_dehop_pipeline.py            End-to-end validation (hopped vs reference)
+&#9474;   &#9474;   &#9500;&#9472; test_pedestrian_model.py          Walking-pedestrian micro-Doppler butterfly
+&#9474;   &#9474;   &#9500;&#9472; test_phase_continuity.py          Verifies TX phase is glitch-free across hops
+&#9474;   &#9474;   &#9500;&#9472; test_taper_envelope.py            Plots dwell-envelope taper shapes
+&#9474;   &#9474;   &#9500;&#9472; cwhopping_config.json             Baseline config (10 ms blackman, 95%, +/-1826 Hz)
+&#9474;   &#9474;   &#9492;&#9472; (library modules, imported only)  generate_hopped_cw.py, generate_reference_cw.py,
+&#9474;   &#9474;                                          generate_scfdma_data.py, make_taper_envelope.py,
+&#9474;   &#9474;                                          walking_micro_doppler.py, dehop_and_stft.py,
+&#9474;   &#9474;                                          compute_quality_metric.py
+&#9474;   &#9474;
+&#9474;   &#9492;&#9472; overtheair/                           C-V2X capture / replay / CW inject / extract
+&#9474;       &#9500;&#9472; README.md
+&#9474;       &#9500;&#9472; cv2x_capture_replay.py            GNU Radio TX/RX for C-V2X, GPSDO/DFN-aligned
+&#9474;       &#9500;&#9472; cv2x_rfnoc_replay.py              High-performance replay via X310 FPGA DRAM
+&#9474;       &#9500;&#9472; cv2x_cw_inject.py                 Inserts a CW tone at (k+0.5) &times; 15 kHz between LTE subcarriers
+&#9474;       &#9500;&#9472; cv2x_cw_txrx.py                   Simultaneous TX replay + narrow-band RX of the CW tone
+&#9474;       &#9492;&#9472; cv2x_microdoppler_extract.py      Offline micro-Doppler extraction from the narrow-band RX
+&#9474;
+&#9492;&#9472; narrowband_paper/
+    &#9500;&#9472; README.md
+    &#9500;&#9472; mc.py                                 N parallel CW subcarriers, TX/RX/simulate modes, QT FFT
+    &#9500;&#9472; capture.bin                           Sample RX capture for playback
+    &#9492;&#9472; capture2.bin                          Sample RX capture for playback</pre>
+
+  <div class="callout warn">
+    <p><span class="tag">Heads up &mdash; frozen snapshot</span>
+      Every <code>README.md</code> tells you
+      <strong>&ldquo;do not edit these files, make copies before experimenting.&rdquo;</strong>
+      The directory is a frozen working snapshot. If you need to modify a
+      script, copy it out first.</p>
+  </div>
+</section>
+
+<!-- ============================= 4. GLOSSARY ============================= -->
+<section id="glossary">
+  <h2>4. Core concepts (quick glossary)</h2>
+
+  <h3 id="g-cw">CW (continuous wave)</h3>
+  <p>A pure sinusoidal tone at a fixed frequency. Nothing is modulated onto
+    it; its only job is to reflect off moving targets and come back
+    Doppler-shifted. Compact in spectrum, easy to analyse.</p>
+
+  <h3 id="g-md">Micro-Doppler</h3>
+  <p>The small, fast Doppler modulations a reflected CW tone picks up from
+    non-bulk motion (a pedestrian's swinging arms and legs, a rotating fan
+    blade, a vehicle's wheels). Visible as sinusoidal &ldquo;butterfly&rdquo; patterns in
+    a spectrogram whose centre line is the bulk Doppler.</p>
+
+  <h3 id="g-stft">STFT (short-time Fourier transform)</h3>
+  <p>Slide a window across the time-domain signal, take an FFT per window,
+    stack the magnitudes into an image. Three tuning knobs matter:</p>
+  <ul>
+    <li><strong>Window length</strong> &mdash; longer windows give finer Doppler resolution but blur rapid changes. Typical values here: 10&ndash;70 ms.</li>
+    <li><strong>Overlap</strong> &mdash; how much consecutive windows share. Higher = smoother time axis, more CPU. Typical values: 50&ndash;95%.</li>
+    <li><strong>Zero-pad factor</strong> &mdash; multiply FFT size beyond window length (interpolates the frequency axis). 4&times; is the common sweet spot.</li>
+  </ul>
+
+  <h3 id="g-dehop">De-hopping</h3>
+  <p>The TX tone jumps between frequencies (e.g. 7.5, 15, 22.5, 30 kHz). On
+    the RX side you multiply by <code>exp(-j&middot;2&pi;&middot;f<sub>k</sub>&middot;t)</code>
+    per dwell &mdash; where <em>t</em> is <em>global</em> sample time, never
+    reset per block &mdash; so every dwell collapses onto DC and can be treated
+    as a single virtual CW tone. The global-time phase is the whole trick.</p>
+
+  <h3 id="g-nco">Phase-continuous NCO</h3>
+  <p>The transmitter uses a numerically controlled oscillator whose phase
+    accumulator never resets at a hop boundary. That way the received tone has
+    no phase jumps to confuse the de-hopper, and
+    <a href="#w0-sim"><code>test_phase_continuity.py</code></a> has something
+    reasonable to validate.</p>
+
+  <h3 id="g-gpsdo">GPSDO</h3>
+  <p>A GPS-disciplined oscillator. Gives every USRP on Earth the same view of
+    UTC time and a shared 10 MHz reference. Two radios locked to GPSDO can
+    start a transmission on the exact same sample boundary, anywhere in the
+    world.</p>
+
+  <h3 id="g-dfn">DFN (Direct Frame Number) and why C-V2X replay needs GPSDO</h3>
+  <p>C-V2X sidelink PHY scrambling is seeded by the Direct Frame Number,
+    which cycles 0&ndash;1023 every <strong>10.24 seconds</strong>
+    (1024 frames &times; 10 subframes &times; 1 ms). The DFN is derived from
+    UTC. If you capture an IQ file at time <em>T</em> and replay it later at
+    an arbitrary time, the DFN at the first replayed sample will no longer
+    match the DFN baked into the scrambler of the captured symbols &mdash; and
+    a commercial C-V2X receiver will refuse to decode it.</p>
+  <p>The fix: capture with <code>--gpsdo</code>, snap duration to an integer
+    multiple of 10.24 s, record the DFN/subframe of the first sample into a
+    JSON sidecar, and on replay wait until UTC time lines up with the
+    captured DFN before transmitting. The scripts
+    <code>cv2x_capture_replay.py</code> and <code>cv2x_rfnoc_replay.py</code>
+    handle this automatically when <code>--gpsdo</code> is set.</p>
+
+  <h3 id="g-scfdma">SC-FDMA</h3>
+  <p>Single-carrier frequency-division multiple access, the uplink PHY used
+    by C-V2X sidelink. Relevant here because you can simulate co-channel
+    interference from it in the hopped-CW simulator, and because the CW
+    injection trick slots a tone precisely between SC-FDMA subcarriers.</p>
+
+  <h3 id="g-sidecar">Sidecar JSON</h3>
+  <p>A small <code>.json</code> file written next to every <code>.cf32</code>
+    capture that records things the raw IQ cannot carry: sample rate, centre
+    frequency, UTC start time, DFN, hop schedule, CW injection parameters,
+    references to other sidecars. Every processing script reads the sidecar
+    to know what it is looking at. See
+    <a href="#file-formats">&sect;12 &mdash; File &amp; sidecar formats</a>.</p>
+
+  <h3 id="g-cf32"><code>.cf32</code> files</h3>
+  <p>Raw interleaved complex-64 IQ samples on disk: each sample is two
+    little-endian 32-bit floats, <em>I</em> then <em>Q</em>. Open with
+    <code>numpy.fromfile(path, dtype=numpy.complex64)</code>. The scripts
+    stream these; a 20 s capture at 30.72 MSps is roughly 5 GB.</p>
+
+  <h3 id="g-taper">Dwell taper envelope</h3>
+  <p>Each hop dwell fades in and out through a small taper (raised cosine,
+    hann, blackman, linear, or none) rather than switching on and off
+    abruptly. Smoother envelopes reduce spectral splatter at the cost of
+    throwing away a bit of the dwell time.</p>
+</section>
+
+<!-- ============================= 5. SIMULATOR ============================= -->
+<section id="w0-sim">
+  <h2>5. Workflow&nbsp;0 &mdash; Start in the simulator (no hardware)</h2>
+
+  <p>
+    Before you burn USRP time, validate the processing chain in the
+    <code>simulator/</code> directory. Nothing here touches hardware: pure
+    Python, pure NumPy, all I/O is in RAM.
+  </p>
+
+  <div class="callout tip">
+    <p><span class="tag">Why bother</span>
+      A clean butterfly in the simulator proves the math is right. If a
+      hardware capture later looks broken, you immediately know the bug is in
+      capture / LO / GPSDO / gain staging, <em>not</em> in the algorithm.
+      Without this step you cannot tell those two cases apart.</p>
+  </div>
+
+  <h3>Runnable scripts vs. library modules</h3>
+  <p>
+    The folder mixes two kinds of Python files. Scripts you can run directly
+    from the command line are listed below. The other files
+    (<code>generate_hopped_cw.py</code>, <code>generate_reference_cw.py</code>,
+    <code>generate_scfdma_data.py</code>, <code>make_taper_envelope.py</code>,
+    <code>walking_micro_doppler.py</code>, <code>dehop_and_stft.py</code>,
+    <code>compute_quality_metric.py</code>) are
+    <strong>library modules</strong>: they provide functions and dataclasses
+    that the runnable scripts import. Do not run them directly &mdash; nothing
+    will happen.
+  </p>
+  <p>All commands in this section assume you have <code>cd</code>ed into the folder:</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>cd multihop_and_cv2x_over_the_air_spectrogram_px/simulator</pre>
+
+  <h3 id="sim-learning-path">5.1 Suggested learning path</h3>
+  <p>Run these in order to understand the pipeline bottom-up:</p>
+
+  <h4>1 &mdash; <code>test_taper_envelope.py</code></h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python test_taper_envelope.py</pre>
+  <p>
+    Plots the dwell amplitude envelope for several taper shapes
+    (<code>raised_cosine</code>, <code>hann</code>, <code>blackman</code>,
+    <code>linear</code>, <code>none</code>) so you can see how
+    <code>taper_pct</code> and <code>min_amp</code> affect the ramp. No CLI
+    args &mdash; edit the hardcoded parameters at the bottom of the file to try
+    different shapes.
+  </p>
+  <p><strong>What you should see:</strong> a matplotlib window with envelope
+    curves overlaid. Smooth ramp regions, flat top at 1.0, reaching
+    <code>min_amp</code> at the guard edges.</p>
+
+  <h4>2 &mdash; <code>test_phase_continuity.py</code></h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python test_phase_continuity.py</pre>
+  <p>
+    Generates a short hopped-CW signal and verifies the instantaneous phase
+    is continuous across every dwell boundary. Prove-out for the
+    phase-accumulator NCO model.
+  </p>
+  <p><strong>What you should see:</strong> console line
+    <code>PASS &mdash; max phase discontinuity = X.XX rad</code> with <em>X</em>
+    near zero, plus an optional plot of unwrapped phase vs. time that looks
+    like a piecewise-linear staircase with no vertical jumps.</p>
+  <p><strong>What failure looks like:</strong> a large phase jump at a dwell
+    boundary, or a <code>FAIL</code> in the console. Caused by a bug in the
+    phase accumulator (it reset when it should not have).</p>
+
+  <h4>3 &mdash; <code>test_pedestrian_model.py</code></h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python test_pedestrian_model.py</pre>
+  <p>
+    Generates a pure-CW signal modulated by the
+    <code>walking_micro_doppler</code> 5-scatterer model (torso + 2 arms
+    + 2 legs) and plots the spectrogram. This is what a walking human looks
+    like to a perfect continuous-CW sensor &mdash; the ground truth the
+    hopped pipeline has to reproduce.
+  </p>
+  <p><strong>What you should see:</strong> the classic micro-Doppler butterfly
+    &mdash; a steady torso band near <code>v_bulk</code>, arm sinusoids
+    oscillating at <code>arm_f_rot</code> Hz, leg sinusoids roughly 1.5&times;
+    the arm Doppler and anti-phase to the arms. Edit
+    <code>PedestrianParams</code> in the script to change walking speed, RCS
+    mix, or carrier frequency.</p>
+
+  <h4>4 &mdash; <code>test_dehop_pipeline.py</code> <span class="pill pill-current">most important</span></h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python test_dehop_pipeline.py</pre>
+  <p>End-to-end validation:</p>
+  <ol>
+    <li>Generate a hopped-CW signal with a pedestrian micro-Doppler modulation.</li>
+    <li>Generate a matching continuous-CW reference.</li>
+    <li>De-hop the hopped signal.</li>
+    <li>STFT both.</li>
+    <li>Plot side-by-side and compute quality metrics.</li>
+  </ol>
+  <p><strong>What you should see:</strong> a two-panel figure where the
+    reference spectrogram (left) and the de-hopped spectrogram (right) show
+    the same butterfly, plus console output with
+    <code>correlation &asymp; 0.9+</code>, <code>sidelobe &le; &minus;30 dB</code>,
+    and a low MSE.</p>
+  <div class="callout warn">
+    <p><span class="tag">Regression gate</span>
+      Run this script <strong>after every edit</strong> to
+      <code>generate_hopped_cw.py</code>, <code>dehop_and_stft.py</code>, or
+      <code>make_taper_envelope.py</code>. If quality drops or the
+      spectrograms diverge, your change broke something &mdash; revert.</p>
+  </div>
+
+  <h4>5 &mdash; <code>cwhopping_explorer.py</code> <span class="pill pill-current">interactive tuning</span></h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhopping_explorer.py</pre>
+  <p>Full tabbed GUI with every parameter exposed as a slider:</p>
+  <ul>
+    <li><strong>Tab 1 &mdash; Hopping CW:</strong> <code>dwell_ms</code>, <code>hop_freqs</code>, <code>taper_shape</code>, <code>taper_pct</code>, <code>min_amp</code>, <code>transition_mode</code>, <code>gap_ms</code> / <code>gap_jitter</code>.</li>
+    <li><strong>Tab 2 &mdash; SC-FDMA Data:</strong> <code>enabled</code>, <code>data_activity</code>, <code>num_subch_max</code>, <code>data_power_dB</code>, <code>spectral_isolation_dB</code>, <code>colocated_tx</code>, <code>cw_inside_alloc</code>.</li>
+    <li><strong>Tab 3 &mdash; Rx / Sim:</strong> pedestrian params (<code>v_bulk</code>, arm/leg Doppler &amp; rate, RCS mix), STFT (<code>window_ms</code>, <code>window_type</code>, <code>overlap_pct</code>, <code>zero_pad</code>), duration, SNR.</li>
+  </ul>
+  <p>
+    Moving a slider regenerates the signal, reruns de-hop + STFT, and updates
+    both spectrograms and the quality score live. Use this to find a good
+    parameter combination before committing it to
+    <code>../cwhopping_config_POST.json</code> for a hardware run.
+  </p>
+
+  <h3 id="sim-common">5.2 Common simulator workflows</h3>
+
+  <h4>A. Validate a config change before a hardware run</h4>
+  <ol>
+    <li>Open <code>cwhopping_explorer.py</code>, move sliders until the quality score is acceptable.</li>
+    <li>Mirror those settings into <code>../cwhopping_config_POST.json</code> (see <a href="#config-ref">&sect;11</a>).</li>
+    <li>Run <code>test_dehop_pipeline.py</code> as a final automated check.</li>
+    <li>Only <em>then</em> run <code>../cwhop_tx.py</code> on the X310.</li>
+  </ol>
+
+  <h4>B. Debug a de-hop artifact seen in a hardware capture</h4>
+  <ol>
+    <li>Reproduce the capture conditions in <code>cwhopping_explorer.py</code> (same dwell, taper, hop frequencies).</li>
+    <li>If the artifact appears in simulation &rarr; it is a signal-design problem, fix in the config.</li>
+    <li>If it does <em>not</em> appear in simulation &rarr; it is a hardware issue (TX/RX timing, gain, LO leakage, GPSDO drift, etc.).</li>
+  </ol>
+
+  <h4>C. Regression-test after editing a library module</h4>
+  <p>After changing <code>generate_hopped_cw.py</code>, <code>dehop_and_stft.py</code>, or <code>make_taper_envelope.py</code>:</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python test_phase_continuity.py   <span class="cmt"># sanity</span>
+python test_dehop_pipeline.py     <span class="cmt"># end-to-end quality</span></pre>
+  <p>Both should PASS / produce a clean butterfly. If either regresses, revert.</p>
+
+  <h4>D. Benchmark quality for a paper table</h4>
+  <p>
+    <code>compute_quality_metric.compute_quality_metric()</code> returns a
+    <code>QualityMetrics</code> dataclass with <code>correlation</code>,
+    <code>peak_sidelobe</code>, <code>dynamic_range</code>, <code>mse_dB</code>.
+    Call it from your own script in a parameter sweep over
+    <code>dwell_ms</code>, <code>taper_pct</code>, etc.
+  </p>
+
+  <div class="callout tip">
+    <p><span class="tag">Where outputs land</span>
+      Most simulator scripts are interactive (pop up a matplotlib window) and
+      do <strong>not</strong> write files to disk by default. To save a PNG,
+      add <code>plt.savefig('out.png', dpi=150)</code> before
+      <code>plt.show()</code> inside the script.</p>
+  </div>
+</section>
+
+<!-- ============================= 6. HOPPED-CW HARDWARE ============================= -->
+<section id="w1-hopped">
+  <h2>6. Workflow&nbsp;1 &mdash; Hopped-CW on hardware</h2>
+  <p>
+    This is the canonical production pipeline (&ldquo;Workflow D&rdquo; in
+    <code>ALL COMMANDS FOR PAPERS - ANNOTATED.txt</code>). A single CW tone
+    hops among four frequencies every dwell; both TX and RX are scheduled to
+    the same GPS time on the X310 so the capture is sample-accurate.
+  </p>
+  <p>All commands assume you are in the parent folder:</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>cd multihop_and_cv2x_over_the_air_spectrogram_px</pre>
+
+  <div class="callout bad">
+    <p><span class="tag">Do not use</span>
+      If you are looking at old notes that mention <code>test_hopper_tx.py</code>,
+      <code>test_hopper_process.py</code>, or <code>doppler_viewer.py</code>,
+      <strong>stop</strong>. Those scripts are archived and use a different
+      sample rate (192 kSps) and sidecar format from the current pipeline.
+      The current replacements are, respectively,
+      <a href="#w1-capture"><code>cwhop_tx.py</code></a>,
+      <a href="#w1-batch"><code>cwhop_rx.py</code></a>, and
+      <a href="#w1-viewer"><code>cwhop_viewer.py</code></a>. See
+      <a href="#archived">&sect;13</a> for the full archive list.</p>
+  </div>
+
+  <!-- 1a: capture -->
+  <h3 id="w1-capture">6.1 &mdash; Step 1a: TX/RX capture (<code>cwhop_tx.py</code>)</h3>
+  <p>
+    Transmits a phase-continuous hopped CW tone and captures the RX
+    simultaneously. Both TX and RX are GPS-scheduled to the same UTC
+    instant.
+  </p>
+
+  <h4>Three ways to run it</h4>
+  <p><strong>a)</strong> Generate the TX file to disk only, no hardware:</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_tx.py <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--output</span> my_capture <span class="flag">--duration</span> 30 <span class="flag">--generate-only</span></pre>
+
+  <p><strong>b)</strong> Hardware TX + simultaneous RX capture (short form):</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_tx.py <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--output</span> my_capture <span class="flag">--duration</span> 60 <span class="flag">--gpsdo</span> <span class="flag">\</span>
+    <span class="flag">--tx-gain</span> 15 <span class="flag">--rx-gain</span> 30</pre>
+
+  <p><strong>c)</strong> Full form with center frequency and UHD device args (the most common production call):</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_tx.py <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--center-freq</span> 5.9e9 <span class="flag">--tx-gain</span> 20 <span class="flag">--rx-gain</span> 30 <span class="flag">\</span>
+    <span class="flag">--duration</span> 20 <span class="flag">--gpsdo</span> <span class="flag">\</span>
+    <span class="flag">--args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span> <span class="flag">\</span>
+    <span class="flag">--output</span> my_capture</pre>
+
+  <h4>Outputs</h4>
+  <table class="grid">
+    <thead><tr><th>File</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td><code>my_capture.cf32</code></td><td>TX baseband, complex64, 30.72 MSps</td></tr>
+      <tr><td><code>my_capture_rx.cf32</code></td><td>RX capture, complex64, 30.72 MSps (same length as TX)</td></tr>
+      <tr><td><code>my_capture_schedule.json</code></td><td>Per-dwell hop schedule: start/end sample, start/end ms, hop frequency</td></tr>
+      <tr><td><code>my_capture_rx.json</code></td><td>RX sidecar: center freq, rate, UTC start, pointer to schedule</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <p><span class="tag">Caveat</span>
+      <code>--args</code> is required unless you have a default UHD device
+      configured system-wide. If you forget it on a multi-USRP host, UHD may
+      bind to the wrong radio. The short-form command (b) above only works on
+      a single-USRP setup.</p>
+  </div>
+
+  <!-- 1b: sanity -->
+  <h3 id="w1-sanity">6.2 &mdash; Step 1b: Sanity-check the raw TX (<code>tx_sanity.py</code> or <code>iq_spectrogram.py</code>)</h3>
+  <p>Before wasting time on a multi-stage processing run, verify the TX file
+     looks correct: the CW tone should jump between the four hop frequencies
+     (7.5 / 15 / 22.5 / 30 kHz) as the dwells advance.</p>
+
+  <p><strong>Hop-aware (recommended when you have a sidecar):</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python tx_sanity.py <span class="flag">--input</span> my_capture.cf32 <span class="flag">\</span>
+    <span class="flag">--sidecar</span> my_capture_schedule.json <span class="flag">--zoom-hz</span> 20000 <span class="flag">--chunk-ms</span> 5</pre>
+  <p>
+    Draws a raw spectrogram with a cyan overlay indicating <em>where the
+    schedule says the tone should be</em>. The overlay should sit exactly on
+    top of the visible tone. If it drifts off, the sidecar or the TX timing
+    is wrong &mdash; fix before processing.
+  </p>
+
+  <p><strong>Generic (works on any .cf32 file, no sidecar required):</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python iq_spectrogram.py my_capture.cf32 <span class="flag">-r</span> 30.72e6 <span class="flag">--decimate</span> 64 <span class="flag">--fft</span> 64 <span class="flag">--db-range</span> 40</pre>
+  <p>This viewer is hop-agnostic &mdash; use it to look at any IQ file, including
+     C-V2X captures and narrow-band RX captures from the other workflows.</p>
+
+  <!-- 1c: viewer -->
+  <h3 id="w1-viewer">6.3 &mdash; Step 1c: Interactive viewer (<code>cwhop_viewer.py</code>)</h3>
+  <p>Best for exploratory analysis and parameter tuning. Builds a decimated
+     cache (approx. 30 s for a 20 s capture) on first open, then lets you tune
+     STFT parameters live.</p>
+
+  <p><strong>Minimal invocation (sidecar and config auto-found from the filename):</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_viewer.py <span class="flag">--input</span> my_capture_rx.cf32</pre>
+
+  <p><strong>With explicit sidecar and config:</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_viewer.py <span class="flag">--input</span> my_capture_rx.cf32 <span class="flag">\</span>
+    <span class="flag">--sidecar</span> my_capture_schedule.json <span class="flag">\</span>
+    <span class="flag">--config</span> cwhopping_config_POST.json</pre>
+
+  <p><strong>Force a rebuild of the cache:</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_viewer.py <span class="flag">--input</span> my_capture_rx.cf32 <span class="flag">--reprocess</span></pre>
+
+  <div class="callout good">
+    <p><span class="tag">Recommended starting settings</span>
+      Once the viewer opens, set:
+      window 70 ms, overlap 80%, zero-pad 4&times;, window type <code>hann</code>,
+      dynamic range 40 dB, Doppler axis &plusmn;500 Hz, <em>stitch</em> ON.
+      These are the values that produced the published result.</p>
+  </div>
+
+  <h4>Interactive controls</h4>
+  <table class="grid">
+    <thead><tr><th>Control</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td>STFT window slider</td><td>FFT window length (ms)</td></tr>
+      <tr><td>Overlap slider</td><td>STFT frame overlap (%)</td></tr>
+      <tr><td>Colormap range sliders</td><td>Dynamic range of the spectrogram image</td></tr>
+      <tr><td>DC notch slider</td><td>Suppress direct TX&rarr;RX coupling (&plusmn;<em>N</em> Hz around DC)</td></tr>
+      <tr><td>Stitch checkbox</td><td>Inter-dwell phase stitching on/off</td></tr>
+      <tr><td>Window radio buttons</td><td>Hann / Hamming / Blackman / Flat-top</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 1d: batch -->
+  <h3 id="w1-batch">6.4 &mdash; Step 1d: Batch export for paper figures (<code>cwhop_rx.py</code>)</h3>
+  <p>For scripted runs and final paper figures. Pulls STFT parameters from
+     the config file directly &mdash; no sliders, reproducible output.</p>
+
+  <p><strong>With the tuned POST config (recommended):</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_rx.py <span class="flag">--input</span> my_capture_rx.cf32 <span class="flag">\</span>
+    <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--plot</span> <span class="flag">--save</span> <span class="flag">--doppler-range</span> 500 <span class="flag">--dynamic-range</span> 40</pre>
+
+  <p><strong>With the baseline config, explicit sidecar, custom output prefix:</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_rx.py <span class="flag">--input</span> my_capture_rx.cf32 <span class="flag">\</span>
+    <span class="flag">--sidecar</span> my_capture_schedule.json <span class="flag">\</span>
+    <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--output-prefix</span> my_capture_results <span class="flag">--save</span> <span class="flag">--plot</span></pre>
+
+  <h4>Outputs</h4>
+  <table class="grid">
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>my_capture_rx_results_plot.png</code></td><td>Rendered spectrogram figure</td></tr>
+      <tr><td><code>my_capture_rx_results_spectrogram.npz</code></td><td><code>(f, t, S_dB)</code> arrays for re-plotting</td></tr>
+      <tr><td><code>my_capture_rx_results_summary.json</code></td><td>Run metadata (STFT parameters, rate, duration, etc.)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- chain -->
+  <h3 id="w1-chain">6.5 &mdash; Processing-chain diagram</h3>
+  <pre class="tree">my_capture_rx.cf32   (complex64, 30.72 MSps)
+        |
+        v
+  De-hop: multiply by exp(-j*2*pi*delta_f*t_global) per dwell
+  (phase-continuous; t is GLOBAL sample time, never reset per block)
+        |
+        v
+  Cascade FIR decimate 3072x: [4,4,4,4,4,3] stages
+  Anti-alias cutoffs: 3.84 MHz -&gt; 960 kHz -&gt; 240 kHz -&gt; 60 kHz -&gt; 15 kHz -&gt; 5 kHz
+  Block boundaries: zero-padded margins (NOT raw signal -- avoids FIR ringing)
+        |
+        v
+  10 kSps baseband   (all dwells at DC, ~80 KB per original second)
+        |
+        v
+  STFT spectrogram   (70 ms hann window, 80% overlap, 4x zero-pad)
+  Resolution: ~2.4 Hz/bin   |   Range: +/-500 Hz
+        |
+        v
+  Micro-Doppler spectrogram  (Doppler Hz vs time s)</pre>
+
+  <h4>Key design decisions</h4>
+  <ul>
+    <li><strong>Phase-continuous TX.</strong> <code>cwhop_tx.py</code> accumulates global phase across dwells with no reset, so the received tone has no phase jumps at hop transitions.</li>
+    <li><strong>Global-time de-hopping.</strong> De-hopping uses <code>t = n / Fs</code> with global sample index <em>n</em>, matching the TX NCO exactly.</li>
+    <li><strong>Zero-padded margins, not raw signal.</strong> Block-boundary FIR margins are zero-padded rather than reading adjacent raw (un-de-hopped) signal. The raw signal at 7.5&ndash;30 kHz passes through the first four decimation stages unattenuated (stage-4 cutoff 60 kHz &gt;&gt; 30 kHz), which caused severe ringing at every block boundary when raw margins were used.</li>
+    <li><strong>TX/RX cache separation.</strong> <code>cwhop_viewer.py</code> uses <code>splitext</code> only for cache naming, so <code>my_capture.cf32</code> and <code>my_capture_rx.cf32</code> never share a cache file.</li>
+    <li><strong>GPSDO timing.</strong> TX and RX are both scheduled to the same GPS-locked time inside <code>cwhop_tx.py</code>, ensuring sample-accurate alignment. This fixed a 7&ndash;23-dwell misalignment that caused ghost images in earlier captures.</li>
+  </ul>
+</section>
+
+<!-- ============================= 7. C-V2X REPLAY ============================= -->
+<section id="w2-cv2x">
+  <h2>7. Workflow&nbsp;2 &mdash; C-V2X capture and replay</h2>
+  <p>
+    Useful on its own for basic record/playback of a real C-V2X sidelink
+    transmission, or as the first step of
+    <a href="#w3-virtsense">Workflow&nbsp;3</a> (CW virtual sensing).
+  </p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>cd multihop_and_cv2x_over_the_air_spectrogram_px/overtheair</pre>
+
+  <div class="callout warn">
+    <p><span class="tag">DFN &mdash; non-negotiable</span>
+      If you omit <code>--gpsdo</code>, the replayed DFN drifts off the
+      captured scrambler seed and a commercial C-V2X receiver will silently
+      fail to decode. See <a href="#g-dfn">&sect;4 &mdash; DFN</a>.
+      Duration is auto-snapped up to the next 10.24 s multiple so the scrambler
+      cycle closes cleanly.</p>
+  </div>
+
+  <h3>7.1 &mdash; Capture a real C-V2X transmission</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_capture_replay.py <span class="flag">--capture</span> <span class="flag">--gpsdo</span> <span class="flag">--headless</span> <span class="flag">\</span>
+    <span class="flag">--rx-freq</span> 5.915e9 <span class="flag">--rx-gain</span> 30 <span class="flag">\</span>
+    <span class="flag">--rx-args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span> <span class="flag">\</span>
+    <span class="flag">--capture-file</span> cv2x_iq.cf32 <span class="flag">--duration</span> 20 <span class="flag">-r</span> 30.72e6</pre>
+
+  <h4>Outputs</h4>
+  <table class="grid">
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>cv2x_iq.cf32</code></td><td>Raw IQ, complex64, 30.72 MSps. Duration auto-snapped <strong>up</strong> to the next 10.24 s multiple.</td></tr>
+      <tr><td><code>cv2x_iq.json</code></td><td>Sidecar: <code>capture_time_utc</code>, <code>dfn</code>, <code>subframe</code>, <code>cycle_offset_ms</code>, <code>sample_rate</code>, <code>center_freq</code>, <code>duration_s</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 &mdash; Replay via GNU Radio</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_capture_replay.py <span class="flag">--replay</span> <span class="flag">--gpsdo</span> <span class="flag">--headless</span> <span class="flag">\</span>
+    <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">\</span>
+    <span class="flag">--tx-args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span> <span class="flag">\</span>
+    <span class="flag">--replay-file</span> cv2x_iq.cf32 <span class="flag">--loop</span> <span class="flag">-r</span> 30.72e6</pre>
+  <p>
+    The script reads <code>cv2x_iq.json</code> automatically. TX waits until
+    UTC time matches the captured DFN/subframe and then starts on that sample
+    boundary &mdash; the scrambler is valid from the very first sample.
+  </p>
+
+  <h3>7.3 &mdash; Replay via FPGA DRAM (RFNoC, recommended for sustained replay)</h3>
+  <p>
+    The GNU Radio path can underflow when the host can't keep up with 30.72
+    MSps, and a single-sample underflow breaks the 1 ms subframe grid. The
+    RFNoC Replay Block path stores the IQ in X310 DRAM and plays it from
+    the FPGA &mdash; no host-side jitter.
+  </p>
+
+  <p><strong>Upload once</strong> (stays in DRAM until power cycle):</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_rfnoc_replay.py <span class="flag">--upload</span> <span class="flag">\</span>
+    <span class="flag">--file</span> cv2x_iq.cf32 <span class="flag">-r</span> 30.72e6 <span class="flag">\</span>
+    <span class="flag">--args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span></pre>
+
+  <p><strong>Play</strong> (repeatable, no re-upload):</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_rfnoc_replay.py <span class="flag">--play</span> <span class="flag">--gpsdo</span> <span class="flag">--loop</span> <span class="flag">\</span>
+    <span class="flag">--file</span> cv2x_iq.cf32 <span class="flag">-r</span> 30.72e6 <span class="flag">\</span>
+    <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">\</span>
+    <span class="flag">--args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span></pre>
+
+  <p><strong>Both in one call:</strong></p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_rfnoc_replay.py <span class="flag">--upload</span> <span class="flag">--play</span> <span class="flag">--gpsdo</span> <span class="flag">--loop</span> <span class="flag">\</span>
+    <span class="flag">--file</span> cv2x_iq.cf32 <span class="flag">-r</span> 30.72e6 <span class="flag">\</span>
+    <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">\</span>
+    <span class="flag">--args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span></pre>
+
+  <div class="callout tip">
+    <p><span class="tag">Tip &mdash; watch for U's</span>
+      If the RFNoC path prints <code>U</code> characters at runtime, the DRAM
+      upload is incomplete or the sample rate is misconfigured &mdash; fix it
+      before trusting the replay.</p>
+  </div>
+</section>
+
+<!-- ============================= 8. CW VIRTUAL SENSING ============================= -->
+<section id="w3-virtsense">
+  <h2>8. Workflow&nbsp;3 &mdash; C-V2X + CW virtual sensing (full chain)</h2>
+
+  <p>
+    The complete micro-Doppler-via-C-V2X pipeline: piggyback a narrow CW
+    sensing tone inside the spectrum of a real C-V2X transmission, replay it
+    so that the commercial OBU/RSU still decodes C-V2X data, and
+    simultaneously extract micro-Doppler from the CW return. Four steps.
+  </p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>cd multihop_and_cv2x_over_the_air_spectrogram_px/overtheair</pre>
+
+  <div class="callout warn">
+    <p><span class="tag">The inject step is easy to miss</span>
+      The original command sheet skipped straight from &ldquo;capture&rdquo; to
+      &ldquo;replay.&rdquo; Between those two steps, you must run
+      <code>cv2x_cw_inject.py</code> to produce the CW-injected file. Without
+      it, the &ldquo;full-chain&rdquo; replay is just a plain C-V2X replay with
+      no sensing tone.</p>
+  </div>
+
+  <h3>8.1 &mdash; Step 1: Capture a real C-V2X transmission</h3>
+  <p>Same as <a href="#w2-cv2x">Workflow&nbsp;2 step 7.1</a>. Produces <code>cv2x_iq.cf32</code> + <code>cv2x_iq.json</code>.</p>
+
+  <h3>8.2 &mdash; Step 2: Inject a CW tone between LTE subcarriers (<code>cv2x_cw_inject.py</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_cw_inject.py <span class="flag">--input</span> cv2x_iq.cf32 <span class="flag">--output</span> cv2x_iq_cw.cf32 <span class="flag">--plot</span></pre>
+  <p>
+    The script detects active subframes in the capture, runs an FFT to find
+    occupied subcarriers, and inserts a CW tone at an offset of
+    <code>(k + 0.5) &times; 15 kHz</code>. Because LTE subcarriers sit on a
+    15 kHz grid, that 0.5-bin offset places the tone <em>exactly</em> between
+    two data subcarriers. The commercial receiver's FFT gridlines ignore it
+    and still decode C-V2X data cleanly.
+  </p>
+
+  <h4>Outputs</h4>
+  <table class="grid">
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>cv2x_iq_cw.cf32</code></td><td>Same IQ stream as the input, plus the injected CW tone</td></tr>
+      <tr><td><code>cv2x_iq_cw.json</code></td><td>All fields from <code>cv2x_iq.json</code>, plus a <code>cw_inject</code> block with <code>f_cw_hz</code>, <code>subcarrier_active_idx</code>, <code>subcarrier_fft_bin</code>, <code>inject_power_db</code>, <code>inject_amplitude</code>, <code>active_subframes[]</code>, <code>num_active</code>, <code>num_total</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 &mdash; Step 3: Simultaneous TX replay + narrow-band RX (<code>cv2x_cw_txrx.py</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_cw_txrx.py <span class="flag">\</span>
+    <span class="flag">--tx-file</span> cv2x_iq_cw.cf32 <span class="flag">\</span>
+    <span class="flag">--rx-file</span> cv2x_rx_doppler.cf32 <span class="flag">\</span>
+    <span class="flag">--args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span> <span class="flag">\</span>
+    <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">\</span>
+    <span class="flag">--rx-gain</span> 30 <span class="flag">--rx-rate</span> 192e3 <span class="flag">\</span>
+    <span class="flag">--duration</span> 60 <span class="flag">--gpsdo</span> <span class="flag">--loop</span></pre>
+
+  <ul>
+    <li><strong>TX daughtercard</strong> replays <code>cv2x_iq_cw.cf32</code> at 30.72 MSps (full 20 MHz C-V2X channel), GPSDO/DFN-aligned.</li>
+    <li><strong>RX daughtercard</strong> tunes to <code>tx_freq + f_cw_hz + rx_offset</code> and captures a narrow ~192 kSps band around the CW tone.</li>
+    <li><strong><code>rx_offset</code></strong> defaults to 50 kHz so the CW tone does not land on DC &mdash; keeps LO leakage from contaminating the sensor.</li>
+  </ul>
+
+  <h4>Outputs</h4>
+  <table class="grid">
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>cv2x_rx_doppler.cf32</code></td><td>Narrow-band RX capture, complex64, 192 kSps</td></tr>
+      <tr><td><code>cv2x_rx_doppler.json</code></td><td>Sidecar with <code>rx_center_freq</code>, <code>rx_rate</code>, <code>rx_offset_hz</code>, <code>cw_baseband_hz</code>, <code>f_cw_hz</code>, <code>cw_rf_hz</code>, <code>rx_start_utc</code>, <code>active_subframes</code>, <code>tx_sidecar_ref</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.4 &mdash; Step 4: Extract micro-Doppler offline (<code>cv2x_microdoppler_extract.py</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_microdoppler_extract.py <span class="flag">\</span>
+    <span class="flag">--input</span> cv2x_rx_doppler.cf32 <span class="flag">\</span>
+    <span class="flag">--sidecar</span> cv2x_iq_cw.json <span class="flag">\</span>
+    <span class="flag">--fft-size</span> 19200 <span class="flag">--overlap</span> 0.9 <span class="flag">\</span>
+    <span class="flag">--doppler-range</span> 500 <span class="flag">--plot</span> <span class="flag">--save</span></pre>
+
+  <h4>What it does, in order</h4>
+  <ol>
+    <li>Coarse FFT to find the exact received CW peak, correcting for the LO offset between TX and RX daughtercards.</li>
+    <li>Mixes the CW tone to DC.</li>
+    <li>Calibrates out the static LO offset.</li>
+    <li>STFT spectrogram (Doppler vs time).</li>
+    <li>Phase tracking at the CW frequency for fine-grained Doppler.</li>
+    <li>Subframe gating &mdash; only shows windows where C-V2X was actually transmitting, using <code>active_subframes</code> from the sidecar.</li>
+  </ol>
+
+  <h4>Outputs</h4>
+  <table class="grid">
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>*_plots.png</code></td><td>Spectrogram figure</td></tr>
+      <tr><td><code>*_spectrogram.npz</code></td><td>STFT arrays</td></tr>
+      <tr><td><code>*_phase.npz</code></td><td>Phase-Doppler time series</td></tr>
+      <tr><td><code>*_summary.json</code></td><td>Run summary (see <a href="#file-formats">&sect;12</a>)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.5 &mdash; Inspecting intermediate files</h3>
+  <p>Any of the three <code>.cf32</code> products above can be eyeballed with the generic spectrogram viewer one directory up:</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button><span class="cmt"># Raw C-V2X capture (wideband)</span>
+python ../iq_spectrogram.py cv2x_iq.cf32 <span class="flag">-r</span> 30.72e6
+
+<span class="cmt"># CW-injected file with sidecar overlay</span>
+python ../iq_spectrogram.py cv2x_iq_cw.cf32 <span class="flag">-r</span> 30.72e6 <span class="flag">--sidecar</span> cv2x_iq_cw.json
+
+<span class="cmt"># Narrow-band RX capture of the CW return</span>
+python ../iq_spectrogram.py cv2x_rx_doppler.cf32 <span class="flag">-r</span> 192e3 <span class="flag">--fft</span> 64 <span class="flag">--step</span> 16</pre>
+
+  <h3>8.6 &mdash; Hopped-CW vs. CW-injection: when to use which</h3>
+  <table class="grid">
+    <thead>
+      <tr><th></th><th>Hopped CW (parent folder)</th><th>OTA C-V2X + CW inject (this folder)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Signal source</td><td>Synthesised frequency-hopping CW</td><td>Real captured C-V2X sidelink</td></tr>
+      <tr><td>CW placement</td><td>Sweeps across 4 sensing bins</td><td>Static, between two data subcarriers</td></tr>
+      <tr><td>Data co-existence</td><td>None (CW only)</td><td>Full commercial C-V2X data preserved</td></tr>
+      <tr><td>Sync</td><td>GPSDO to align TX/RX</td><td>GPSDO + DFN to preserve scrambler</td></tr>
+      <tr><td>Use case</td><td>Clean sensing-channel characterisation</td><td>Realistic coexistence study</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================= 9. NARROWBAND ============================= -->
+<section id="w4-narrow">
+  <h2>9. Workflow&nbsp;4 &mdash; Narrowband parallel CW comb (<code>mc.py</code>)</h2>
+  <p>
+    Separate paper, simpler signal. <code>mc.py</code> programmatically builds
+    a GNU Radio flowgraph with <em>N</em> native C++ <code>sig_source_c</code>
+    blocks summed via an Add block, creating a comb of CW tones symmetric
+    around DC. Live QT GUI FFT sinks show both TX and RX spectra in real
+    time.
+  </p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>cd narrowband_paper</pre>
+
+  <h3>9.1 &mdash; Subcarrier placement</h3>
+  <table class="grid">
+    <thead><tr><th>n</th><th>Placement</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>[0]</code></td></tr>
+      <tr><td>2</td><td><code>[&minus;s, +s]</code></td></tr>
+      <tr><td>3</td><td><code>[&minus;s, 0, +s]</code></td></tr>
+      <tr><td>4</td><td><code>[&minus;2s, &minus;s, +s, +2s]</code></td></tr>
+      <tr><td>5</td><td><code>[&minus;2s, &minus;s, 0, +s, +2s]</code></td></tr>
+    </tbody>
+  </table>
+  <p>where <em>s</em> = <code>--spacing</code>. Per-tone amplitude is
+     <code>amplitude / N</code> so the summed signal never clips.</p>
+
+  <h3>9.2 &mdash; Four modes</h3>
+
+  <h4>Software only (no hardware)</h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python mc.py <span class="flag">-n</span> 9</pre>
+  <p>CPU-throttled signal generation with a live TX spectrum display. Useful
+     to confirm the subcarrier layout before touching an SDR.</p>
+
+  <h4>TX only</h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python mc.py <span class="flag">-n</span> 10 <span class="flag">-s</span> 100e3 <span class="flag">-r</span> 20e6 <span class="flag">--fft-size</span> 1024 <span class="flag">\</span>
+    <span class="flag">--tx</span> <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">--tx-args</span> <span class="str">"serial=33767A5"</span></pre>
+
+  <h4>TX + RX</h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python mc.py <span class="flag">-n</span> 10 <span class="flag">-s</span> 100e3 <span class="flag">-r</span> 20e6 <span class="flag">--fft-size</span> 1024 <span class="flag">\</span>
+    <span class="flag">--tx</span> <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">--tx-args</span> <span class="str">"serial=33767A5"</span> <span class="flag">\</span>
+    <span class="flag">--rx</span> <span class="flag">--rx-freq</span> 5.915e9 <span class="flag">--rx-gain</span> 30 <span class="flag">--rx-args</span> <span class="str">"serial=33767A5"</span></pre>
+
+  <h4>RX only (spectrum viewer)</h4>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python mc.py <span class="flag">-n</span> 1 <span class="flag">--rx</span> <span class="flag">--rx-freq</span> 5.915e9 <span class="flag">--rx-gain</span> 30 <span class="flag">\</span>
+    <span class="flag">--rx-args</span> <span class="str">"serial=33767A5"</span> <span class="flag">--fft-size</span> 1024</pre>
+  <p>Optionally add <code>--rx-file capture.bin</code> to save the RX stream to disk for later replay.</p>
+
+  <h3>9.3 &mdash; CLI reference</h3>
+  <details class="flags" open>
+    <summary>All flags for <code>mc.py</code></summary>
+    <table class="grid">
+      <thead><tr><th>Flag</th><th>Default</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>-n / --num-subcarriers</code></td><td>9</td><td>Number of CW tones</td></tr>
+        <tr><td><code>-s / --spacing</code></td><td>100 kHz</td><td>Spacing between tones</td></tr>
+        <tr><td><code>-r / --samp-rate</code></td><td>20 MHz</td><td>Baseband sample rate</td></tr>
+        <tr><td><code>-a / --amplitude</code></td><td>1.0</td><td>Total signal amplitude (split across tones)</td></tr>
+        <tr><td><code>--fft-size</code></td><td>4096</td><td>QT FFT display size</td></tr>
+        <tr><td><code>--tx</code></td><td>off</td><td>Enable USRP TX</td></tr>
+        <tr><td><code>--tx-freq</code></td><td>915 MHz</td><td>TX center freq</td></tr>
+        <tr><td><code>--tx-gain</code></td><td>30</td><td>TX gain (dB)</td></tr>
+        <tr><td><code>--tx-args</code></td><td>""</td><td>UHD device args</td></tr>
+        <tr><td><code>--rx</code></td><td>off</td><td>Enable USRP RX</td></tr>
+        <tr><td><code>--rx-freq</code></td><td>915 MHz</td><td>RX center freq</td></tr>
+        <tr><td><code>--rx-gain</code></td><td>30</td><td>RX gain (dB)</td></tr>
+        <tr><td><code>--rx-args</code></td><td>""</td><td>UHD device args</td></tr>
+        <tr><td><code>--rx-file</code></td><td>none</td><td>Save RX stream to <code>.bin</code></td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <div class="callout tip">
+    <p><span class="tag">Not the same pipeline</span>
+      <code>mc.py</code> does not share sidecar formats, sample rates, or
+      processing scripts with the hopped-CW pipeline. Its RX <code>.bin</code>
+      files are for live viewing and replay within <code>mc.py</code>, not for
+      offline micro-Doppler analysis.</p>
+  </div>
+</section>
+
+<!-- ============================= 10. LIVE MONITORING ============================= -->
+<section id="live">
+  <h2>10. Live monitoring during an experiment (<code>cv2x_microdoppler_cw2.py</code>)</h2>
+  <p>
+    Real-time visual feedback while you move a target in front of the antenna
+    &mdash; useful for aiming, positioning, or quick qualitative demos. This
+    is a completely separate workflow from the offline hopped-CW pipeline:
+    single static CW tone, no hopping, no de-hopping, no config file.
+  </p>
+
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>python cv2x_microdoppler_cw2.py <span class="flag">-r</span> 1e6 <span class="flag">--fft-size</span> 1024 <span class="flag">\</span>
+    <span class="flag">--tx</span> <span class="flag">--tx-freq</span> 5.915e9 <span class="flag">--tx-gain</span> 15 <span class="flag">--tx-args</span> <span class="str">"serial=33767A5"</span> <span class="flag">\</span>
+    <span class="flag">--rx</span> <span class="flag">--rx-freq</span> 5.915e9 <span class="flag">--rx-gain</span> 30 <span class="flag">--rx-args</span> <span class="str">"serial=33767A5"</span> <span class="flag">\</span>
+    <span class="flag">-s</span> 200e3 <span class="flag">--avg-frames</span> 20</pre>
+
+  <p>Three panels update in real time:</p>
+  <ol>
+    <li><strong>TX baseband spectrum</strong> &mdash; confirms the CW tone is actually transmitting.</li>
+    <li><strong>RX averaged spectrum</strong> &mdash; Doppler bumps either side of the CW peak when something is moving.</li>
+    <li><strong>RX waterfall</strong> &mdash; scrolling spectrogram, Doppler arcs left/right of centre.</li>
+  </ol>
+
+  <h4>Key tuning</h4>
+  <ul>
+    <li><code>--avg-frames 10</code> for fast gestures (a swinging hand).</li>
+    <li><code>--avg-frames 50</code> for slow vehicle motion.</li>
+    <li>Pure-software mode with no SDR: <code>python cv2x_microdoppler_cw2.py -s 200e3</code>.</li>
+  </ul>
+
+  <div class="callout warn">
+    <p><span class="tag">Live only</span>
+      This script does not write a capture file suitable for offline
+      processing. Use it for aiming and qualitative demos &mdash; then switch
+      to the hopped-CW pipeline
+      (<a href="#w1-hopped">&sect;6</a>) or the CW-injection pipeline
+      (<a href="#w3-virtsense">&sect;8</a>) for publication-quality
+      spectrograms.</p>
+  </div>
+</section>
+
+<!-- ============================= 11. CONFIG REFERENCE ============================= -->
+<section id="config-ref">
+  <h2>11. Configuration file reference</h2>
+
+  <p>
+    The hopped-CW pipeline is driven by a single JSON config file. Two ship
+    in this repo:
+  </p>
+  <ul>
+    <li><code>simulator/cwhopping_config.json</code> &mdash; baseline, used by the simulator. Blackman / 16 ms / 95% overlap / &plusmn;1826 Hz Doppler axis.</li>
+    <li><code>cwhopping_config_POST.json</code> &mdash; tuned, used for the published hardware result. Hann / 70 ms / 80% overlap / &plusmn;500 Hz Doppler axis.</li>
+  </ul>
+
+  <h3>11.1 &mdash; Full schema with sample values</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"version"</span>: 1,
+  <span class="str">"transmitter"</span>: {
+    <span class="str">"dwell_ms"</span>: 100,
+    <span class="str">"hop_freqs_hz"</span>: [7500.0, 15000.0, 22500.0, 30000.0],
+    <span class="str">"hop_sparsity"</span>: 1,
+    <span class="str">"taper_shape"</span>: <span class="str">"linear"</span>,
+    <span class="str">"taper_pct"</span>: 0.0,
+    <span class="str">"min_amplitude"</span>: 0.204,
+    <span class="str">"transition_mode"</span>: <span class="str">"step"</span>,
+    <span class="str">"gap_ms"</span>: 0,
+    <span class="str">"gap_jitter_ms"</span>: 0,
+    <span class="str">"A_cw"</span>: 1.0
+  },
+  <span class="str">"scfdma"</span>: {
+    <span class="str">"enabled"</span>: false,
+    <span class="str">"scenario"</span>: <span class="str">"Co-located, CW inside alloc"</span>,
+    <span class="str">"colocated_tx"</span>: true,
+    <span class="str">"cw_inside_alloc"</span>: true,
+    <span class="str">"data_activity"</span>: 0,
+    <span class="str">"num_subch_max"</span>: 18,
+    <span class="str">"data_power_dB"</span>: 10,
+    <span class="str">"spectral_isolation_dB"</span>: 23
+  },
+  <span class="str">"receiver"</span>: {
+    <span class="str">"stft_window_ms"</span>: 70,
+    <span class="str">"window_type"</span>: <span class="str">"hann"</span>,
+    <span class="str">"overlap_pct"</span>: 80,
+    <span class="str">"zero_pad_factor"</span>: 4,
+    <span class="str">"per_dwell_window"</span>: false,
+    <span class="str">"blank_transitions"</span>: false,
+    <span class="str">"doppler_range_hz"</span>: 500
+  },
+  <span class="str">"hardware"</span>: {
+    <span class="str">"Fs_hz"</span>: 30720000,
+    <span class="str">"center_freq_hz"</span>: 5900000000,
+    <span class="str">"bandwidth_hz"</span>: 20000000,
+    <span class="str">"num_sensing_bins"</span>: 1199,
+    <span class="str">"bin_spacing_hz"</span>: 7500,
+    <span class="str">"decimation_factor"</span>: 3072
+  }
+}</pre>
+
+  <h3>11.2 &mdash; Field-by-field meaning</h3>
+
+  <h4><code>transmitter</code></h4>
+  <table class="grid">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>dwell_ms</code></td><td>Duration of each hop dwell (ms).</td></tr>
+      <tr><td><code>hop_freqs_hz</code></td><td>Hop frequencies, in Hz, offset from carrier. Default set: 7.5, 15, 22.5, 30 kHz.</td></tr>
+      <tr><td><code>hop_sparsity</code></td><td>Cycle step through <code>hop_freqs_hz</code>; 1 = every dwell advances one frequency.</td></tr>
+      <tr><td><code>taper_shape</code></td><td><code>raised_cosine</code> / <code>hann</code> / <code>blackman</code> / <code>linear</code> / <code>none</code></td></tr>
+      <tr><td><code>taper_pct</code></td><td>Fraction of each dwell spent in the ramp region. <code>0.0</code> = no taper. <strong>Caveat:</strong> values as high as 0.397 leave only ~13 ms of flat top per 64 ms dwell &mdash; avoid for micro-Doppler work.</td></tr>
+      <tr><td><code>min_amplitude</code></td><td>Amplitude at the guard edges of the taper.</td></tr>
+      <tr><td><code>transition_mode</code></td><td><code>step</code> (instant hop), otherwise a gradual transition.</td></tr>
+      <tr><td><code>gap_ms</code>, <code>gap_jitter_ms</code></td><td>Silence between dwells (keep at 0 for 100% duty cycle).</td></tr>
+      <tr><td><code>A_cw</code></td><td>CW tone amplitude scale factor (1.0 = full scale).</td></tr>
+    </tbody>
+  </table>
+
+  <h4><code>scfdma</code></h4>
+  <p>Only exercised in the simulator when modelling SC-FDMA co-channel
+     interference. Fields: <code>enabled</code>, <code>scenario</code> label,
+     <code>colocated_tx</code>, <code>cw_inside_alloc</code>,
+     <code>data_activity</code> (0&ndash;1), <code>num_subch_max</code>,
+     <code>data_power_dB</code>, <code>spectral_isolation_dB</code>. See
+     <code>simulator/generate_scfdma_data.py</code> (library module) for the model.</p>
+
+  <h4><code>receiver</code></h4>
+  <table class="grid">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>stft_window_ms</code></td><td>STFT window length. 70 ms in POST config; 16 ms in baseline.</td></tr>
+      <tr><td><code>window_type</code></td><td><code>hann</code> (POST) or <code>blackman</code> (baseline).</td></tr>
+      <tr><td><code>overlap_pct</code></td><td>Frame overlap. 80% in POST, 95% in baseline.</td></tr>
+      <tr><td><code>zero_pad_factor</code></td><td>FFT zero-pad multiplier. 4&times; is the usual sweet spot.</td></tr>
+      <tr><td><code>per_dwell_window</code></td><td>If true, window function is re-applied per-dwell instead of continuously.</td></tr>
+      <tr><td><code>blank_transitions</code></td><td>If true, zero out dwell transition regions before STFT.</td></tr>
+      <tr><td><code>doppler_range_hz</code></td><td>Plotting axis limit (&plusmn;Hz).</td></tr>
+    </tbody>
+  </table>
+
+  <h4><code>hardware</code></h4>
+  <p>Describes the capture parameters assumed by the processing chain:
+     30.72 MSps sample rate, 5.9 GHz centre, 20 MHz bandwidth, 1199 sensing
+     bins on 7.5 kHz spacing, 3072&times; decimation down to 10 kSps baseband.
+     Change these only if you truly know what you are doing &mdash; many other
+     things (decimation filter design, STFT bin layout) assume the defaults.</p>
+
+  <h3>11.3 &mdash; Baseline vs. POST: what changed</h3>
+  <table class="grid">
+    <thead><tr><th>Setting</th><th>Baseline (<code>simulator/cwhopping_config.json</code>)</th><th>POST (<code>cwhopping_config_POST.json</code>)</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>stft_window_ms</code></td><td>16</td><td>70</td><td>Better Doppler frequency resolution (trade: blurred fast motion)</td></tr>
+      <tr><td><code>window_type</code></td><td>blackman</td><td>hann</td><td>Slightly narrower main lobe, fewer sidelobes</td></tr>
+      <tr><td><code>overlap_pct</code></td><td>95</td><td>80</td><td>Less CPU, still-smooth time axis</td></tr>
+      <tr><td><code>doppler_range_hz</code></td><td>1826</td><td>500</td><td>Zoom in on pedestrian / rotating-panel Doppler</td></tr>
+      <tr><td><code>gap_ms</code></td><td>11</td><td>0</td><td>100% duty cycle (more SNR, no spread)</td></tr>
+      <tr><td><code>data_activity</code></td><td>0.973</td><td>0</td><td>Disable SC-FDMA interference model on hardware</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================= 12. FILE FORMATS ============================= -->
+<section id="file-formats">
+  <h2>12. File and sidecar formats</h2>
+  <p>Everything the pipeline produces is either an IQ stream, a sidecar JSON,
+     a NumPy archive, or a PNG. Knowing which is which means you can script
+     your own post-processing or answer &ldquo;where did that number come
+     from?&rdquo;</p>
+
+  <h3>12.1 &mdash; Naming conventions</h3>
+  <table class="grid">
+    <thead><tr><th>Extension</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>.cf32</code></td><td>Raw IQ: interleaved complex64 (two little-endian float32s per sample, I then Q). Open with <code>numpy.fromfile(path, dtype=numpy.complex64)</code>.</td></tr>
+      <tr><td><code>.bin</code></td><td>Same layout as <code>.cf32</code> &mdash; used by <code>mc.py</code> captures.</td></tr>
+      <tr><td><code>.json</code> (sidecar)</td><td>Metadata: sample rate, centre frequency, UTC start, DFN, hop schedule, CW injection parameters, references to other sidecars.</td></tr>
+      <tr><td><code>_10k.npz</code></td><td>Decimated cache produced by <code>cwhop_viewer.py</code>. Delete or pass <code>--reprocess</code> to rebuild.</td></tr>
+      <tr><td><code>_spectrogram.npz</code></td><td><code>(f, t, S_dB)</code> arrays of the rendered spectrogram.</td></tr>
+      <tr><td><code>_phase.npz</code></td><td>Phase-tracked Doppler time series from <code>cv2x_microdoppler_extract.py</code>.</td></tr>
+      <tr><td><code>_plot.png</code> / <code>_plots.png</code></td><td>Rendered spectrogram figure.</td></tr>
+      <tr><td><code>_summary.json</code></td><td>Top-level run summary: parameters, detected frequencies, optional validation block.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Hopped-CW file pairing</h4>
+  <p><code>cwhop_tx.py --output my_capture</code> produces four files:</p>
+  <pre class="tree">my_capture.cf32            TX baseband
+my_capture_rx.cf32         RX capture (same length as TX)
+my_capture_schedule.json   Per-dwell hop schedule (TX sidecar)
+my_capture_rx.json         RX sidecar, points at schedule via tx_sidecar_ref</pre>
+  <p>Processing scripts discover the sidecar automatically from the
+     <code>.cf32</code> basename &mdash; you rarely pass sidecars explicitly.</p>
+
+  <h3>12.2 &mdash; Plain C-V2X capture sidecar (<code>cv2x_iq.json</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"capture_time_utc"</span>: 1774405800.336,
+  <span class="str">"cycle_offset_ms"</span>: 9616,
+  <span class="str">"dfn"</span>: 961,
+  <span class="str">"subframe"</span>: 6,
+  <span class="str">"sample_rate"</span>: 30720000.0,
+  <span class="str">"center_freq"</span>: 5915000000.0,
+  <span class="str">"duration_s"</span>: 20.48
+}</pre>
+  <p>
+    <code>dfn</code> + <code>subframe</code> + <code>cycle_offset_ms</code> are
+    the three fields the replay scripts use to line UTC time back up with the
+    first captured sample. <code>duration_s</code> is always a multiple of
+    10.24.
+  </p>
+
+  <h3>12.3 &mdash; Post-inject sidecar (<code>cv2x_iq_cw.json</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"capture_time_utc"</span>: 1774405800.336,
+  <span class="str">"cycle_offset_ms"</span>: 9616,
+  <span class="str">"dfn"</span>: 961,
+  <span class="str">"subframe"</span>: 6,
+  <span class="str">"sample_rate"</span>: 30720000.0,
+  <span class="str">"center_freq"</span>: 5915000000.0,
+  <span class="str">"duration_s"</span>: 20.48,
+  <span class="str">"cw_inject"</span>: {
+    <span class="str">"f_cw_hz"</span>: 1477500.0,
+    <span class="str">"subcarrier_active_idx"</span>: 698,
+    <span class="str">"subcarrier_fft_bin"</span>: 1122,
+    <span class="str">"inject_power_db"</span>: -6.0,
+    <span class="str">"inject_amplitude"</span>: 0.03064739184083252,
+    <span class="str">"per_subframe"</span>: false,
+    <span class="str">"active_subframes"</span>: [17, 120, 222, 324, <span class="cmt">/* ...495 entries total... */</span>],
+    <span class="str">"num_active"</span>: 495,
+    <span class="str">"num_total"</span>: 20480
+  }
+}</pre>
+  <p>
+    Every field from the plain sidecar is preserved. The new
+    <code>cw_inject</code> block tells downstream scripts exactly where the
+    CW tone was placed (<code>f_cw_hz</code>, <code>subcarrier_fft_bin</code>),
+    how loud (<code>inject_power_db</code>, <code>inject_amplitude</code>),
+    and which 1-ms subframes the original capture was actually transmitting
+    C-V2X data in (<code>active_subframes</code>). The extractor uses
+    <code>active_subframes</code> to gate the spectrogram so you only see
+    Doppler from moments when the transmitter was on.
+  </p>
+
+  <h3>12.4 &mdash; Narrow-band RX sidecar (<code>cv2x_rx_doppler.json</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"rx_center_freq"</span>: 5916527500.0,
+  <span class="str">"rx_rate"</span>: 192000.0,
+  <span class="str">"rx_offset_hz"</span>: 50000.0,
+  <span class="str">"cw_baseband_hz"</span>: -50000.0,
+  <span class="str">"f_cw_hz"</span>: 1477500.0,
+  <span class="str">"cw_rf_hz"</span>: 5916477500.0,
+  <span class="str">"rx_start_utc"</span>: 1774416121.868,
+  <span class="str">"duration_s"</span>: 60.0,
+  <span class="str">"active_subframes"</span>: [17, 120, 222, <span class="cmt">/* copied from the TX sidecar */</span>],
+  <span class="str">"num_active"</span>: 495,
+  <span class="str">"num_total"</span>: 20480,
+  <span class="str">"tx_file_duration_s"</span>: 20.48,
+  <span class="str">"tx_sidecar_ref"</span>: <span class="str">"cv2x_iq_cw.json"</span>
+}</pre>
+  <p>
+    <code>cw_baseband_hz</code> is where the CW tone <em>should</em> land in
+    the 192 kSps baseband after mixing &mdash; typically around
+    <code>-rx_offset_hz</code>. The extract script uses the coarse FFT to
+    measure the actual received peak and correct for any LO offset between
+    TX and RX daughtercards.
+  </p>
+
+  <h3>12.5 &mdash; Hopped-CW TX schedule (<code>my_capture_schedule.json</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"version"</span>: 1,
+  <span class="str">"config_file"</span>: <span class="str">"...cwhopping_config.json"</span>,
+  <span class="str">"Fs_hz"</span>: 30720000,
+  <span class="str">"N_total"</span>: 614400000,
+  <span class="str">"hop_schedule"</span>: [
+    { <span class="str">"dwell_idx"</span>: 0, <span class="str">"start_sample"</span>: 0,        <span class="str">"end_sample"</span>: 1535999,
+      <span class="str">"freq_hz"</span>: 7500.0,  <span class="str">"start_ms"</span>: 0.0,   <span class="str">"end_ms"</span>: 49.999967 },
+    { <span class="str">"dwell_idx"</span>: 1, <span class="str">"start_sample"</span>: 1536000,  <span class="str">"end_sample"</span>: 3071999,
+      <span class="str">"freq_hz"</span>: 15000.0, <span class="str">"start_ms"</span>: 50.0,  <span class="str">"end_ms"</span>: 99.999967 },
+    { <span class="str">"dwell_idx"</span>: 2, <span class="str">"start_sample"</span>: 3072000,  <span class="str">"end_sample"</span>: 4607999,
+      <span class="str">"freq_hz"</span>: 22500.0, <span class="str">"start_ms"</span>: 100.0, <span class="str">"end_ms"</span>: 149.999967 },
+    <span class="cmt">// ...one entry per dwell, for the whole capture...</span>
+  ]
+}</pre>
+  <p>
+    Every dwell is an exact sample range and the hop frequency in force
+    during that range. <code>tx_sanity.py</code> reads this to draw the cyan
+    overlay; <code>cwhop_rx.py</code> reads it to de-hop.
+  </p>
+
+  <h3>12.6 &mdash; Hopped-CW RX sidecar (<code>my_capture_rx.json</code>)</h3>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"version"</span>: 1,
+  <span class="str">"rx_center_freq_hz"</span>: 5900000000.0,
+  <span class="str">"rx_rate_hz"</span>: 30720000.0,
+  <span class="str">"rx_start_utc"</span>: 1774988901.361,
+  <span class="str">"duration_s"</span>: 20.0,
+  <span class="str">"tx_sidecar_ref"</span>: <span class="str">"...\\my_capture_schedule.json"</span>
+}</pre>
+
+  <h3>12.7 &mdash; Extract summary (<code>*_summary.json</code>)</h3>
+  <p>Minimal form (<code>cv2x_microdoppler_extract.py</code>, no validation):</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"input_file"</span>: <span class="str">"cv2x_rx_doppler.cf32"</span>,
+  <span class="str">"rate"</span>: 192000.0,
+  <span class="str">"duration_s"</span>: 59.574375,
+  <span class="str">"f_cw_measured"</span>: -50000.0,
+  <span class="str">"f_lo_offset"</span>: 39152.11328125,
+  <span class="str">"fft_size"</span>: 9600,
+  <span class="str">"overlap"</span>: 0.9,
+  <span class="str">"window"</span>: <span class="str">"blackmanharris"</span>,
+  <span class="str">"freq_resolution_hz"</span>: 20.0,
+  <span class="str">"time_step_s"</span>: 0.005,
+  <span class="str">"active_only"</span>: true,
+  <span class="str">"num_active_sf"</span>: 1456,
+  <span class="str">"doppler_mean_hz"</span>: 8.61,
+  <span class="str">"doppler_std_hz"</span>: 183.88
+}</pre>
+  <p>With a validation block (appears on synthetic or known-stationary
+     captures, where the expected Doppler is zero):</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button>{
+  <span class="str">"input_file"</span>: <span class="str">"test_hopper_rx_allactive.cf32"</span>,
+  <span class="cmt">// ...all of the fields above...</span>
+  <span class="str">"validation"</span>: {
+    <span class="str">"passed"</span>: true,
+    <span class="str">"expected_doppler_hz"</span>: 0.0,
+    <span class="str">"doppler_mean_hz"</span>: 16.23,
+    <span class="str">"doppler_std_hz"</span>: 180.99,
+    <span class="str">"doppler_median_hz"</span>: 1.00,
+    <span class="str">"doppler_max_abs_hz"</span>: 498.11,
+    <span class="str">"mean_error_hz"</span>: 16.23,
+    <span class="str">"pass_threshold_hz"</span>: 200.0,
+    <span class="str">"n_estimates"</span>: 734,
+    <span class="str">"n_total"</span>: 734
+  }
+}</pre>
+
+  <h3>12.8 &mdash; <code>.npz</code> archives</h3>
+  <table class="grid">
+    <thead><tr><th>File</th><th>Arrays inside</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>*_spectrogram.npz</code></td>
+        <td><code>f</code> (Doppler frequency axis, Hz), <code>t</code> (time axis, s), <code>S_dB</code> (spectrogram magnitude in dB, shape <code>len(f) &times; len(t)</code>).</td>
+      </tr>
+      <tr>
+        <td><code>*_phase.npz</code></td>
+        <td>Phase-Doppler time series from <code>cv2x_microdoppler_extract.py</code>.</td>
+      </tr>
+      <tr>
+        <td><code>*_10k.npz</code></td>
+        <td>Decimated 10 kSps IQ cache built by <code>cwhop_viewer.py</code>. Implementation detail &mdash; you rarely read this directly.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Load in Python:</p>
+  <pre class="code"><button class="copy-btn" type="button">Copy</button><span class="cmt">import numpy as np</span>
+d = np.load(<span class="str">"my_capture_rx_results_spectrogram.npz"</span>)
+f, t, S_dB = d[<span class="str">"f"</span>], d[<span class="str">"t"</span>], d[<span class="str">"S_dB"</span>]</pre>
+</section>
+
+<!-- ============================= 13. ARCHIVED ============================= -->
+<section id="archived">
+  <h2>13. Archived / do-not-use commands</h2>
+
+  <div class="callout bad">
+    <p><span class="tag">Why this section exists</span>
+      A lot of old Slack messages, notes, and chat logs reference commands
+      that have been superseded. Pasting them into a new terminal today will
+      either error out, produce misleading results, or silently process the
+      wrong file. This section lists the archived commands and the current
+      replacement for each.</p>
+  </div>
+
+  <h3>13.1 &mdash; Workflow C (hopped-CW sanity) &mdash; ARCHIVED</h3>
+  <p>Superseded in March by the <code>cwhop_*</code> scripts. Scripts moved to <code>archive/</code> in the reference project.</p>
+
+  <table class="grid">
+    <thead><tr><th>Old script</th><th>Status</th><th>Use instead</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>test_hopper_tx.py</code></td>
+        <td><span class="pill pill-archived">archived</span></td>
+        <td><a href="#w1-capture"><code>cwhop_tx.py</code></a></td>
+      </tr>
+      <tr>
+        <td><code>test_hopper_process.py</code></td>
+        <td><span class="pill pill-archived">archived</span></td>
+        <td><a href="#w1-batch"><code>cwhop_rx.py</code></a></td>
+      </tr>
+      <tr>
+        <td><code>doppler_viewer.py</code></td>
+        <td><span class="pill pill-archived">archived</span></td>
+        <td><a href="#w1-viewer"><code>cwhop_viewer.py</code></a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>13.2 &mdash; Why you cannot mix</h3>
+  <ul>
+    <li>The archived scripts run at <strong>192 kSps</strong>. The current pipeline runs at <strong>30.72 MSps</strong> and decimates internally.</li>
+    <li>The archived scripts use a <strong>1 ms subframe-based</strong> sidecar. The current pipeline uses a <strong>dwell-based</strong> sidecar (~50 ms per entry).</li>
+    <li><code>test_hopper_process.py</code> explicitly <strong>cannot</strong> process <code>cwhop_tx.py</code> captures &mdash; the sample rate and sidecar format do not match.</li>
+  </ul>
+
+  <h3>13.3 &mdash; Flags that only existed on archived scripts</h3>
+  <p>The flags <code>--no-sync</code>, <code>--window-dur</code>,
+     <code>--doppler-spread</code>, <code>--synthetic</code>,
+     <code>--all-active</code>, and <code>--single-freq</code> were specific
+     to the archived scripts. Their nearest equivalents on the current
+     pipeline are:</p>
+  <table class="grid">
+    <thead><tr><th>Archived flag</th><th>Equivalent in current pipeline</th></tr></thead>
+    <tbody>
+      <tr><td><code>--doppler-spread</code></td><td><code>--doppler-range</code> on <code>cwhop_rx.py</code></td></tr>
+      <tr><td><code>--window-dur</code></td><td><code>receiver.stft_window_ms</code> in the config file (or the viewer slider)</td></tr>
+      <tr><td><code>--synthetic</code></td><td>Run a simulator script (<code>test_dehop_pipeline.py</code>, <code>cwhopping_explorer.py</code>)</td></tr>
+      <tr><td><code>--no-sync</code></td><td>Not needed &mdash; current pipeline is sample-aligned via GPSDO</td></tr>
+      <tr><td><code>--all-active</code></td><td>Set <code>transmitter.gap_ms = 0</code> in the config (100% duty)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================= 14. TROUBLESHOOTING ============================= -->
+<section id="troubleshooting">
+  <h2>14. Troubleshooting</h2>
+
+  <h3>14.1 &mdash; Commercial radio won't decode after replay</h3>
+  <ul>
+    <li>Verify <code>--gpsdo</code> was set on both capture and replay. Without it, DFN drifts.</li>
+    <li>Verify capture duration is an integer multiple of 10.24 s (check <code>duration_s</code> in the sidecar).</li>
+    <li>Check GPSDO lock: <code>uhd_usrp_probe --args "type=x300"</code>. Look for <code>gps_locked: true</code>.</li>
+    <li>On the RFNoC path, watch for <code>U</code> characters on stdout &mdash; underflows mean DRAM upload isn't complete or sample rate is misconfigured.</li>
+  </ul>
+
+  <h3>14.2 &mdash; CW tone not visible in the RX</h3>
+  <ul>
+    <li>Confirm <code>f_cw_hz</code> in <code>cv2x_iq_cw.json</code> matches what you expect.</li>
+    <li>Verify the RX tuned to <code>tx_freq + f_cw_hz + rx_offset</code> &mdash; <code>cv2x_cw_txrx.py</code> does this automatically from the sidecar.</li>
+    <li>Check TX/RX gain balance &mdash; the CW can be buried in C-V2X data if TX gain is too low or RX gain too high.</li>
+  </ul>
+
+  <h3>14.3 &mdash; Micro-Doppler spectrogram looks like noise</h3>
+  <ul>
+    <li>Run <code>cv2x_microdoppler_extract.py --plot</code> with <em>no</em> moving target. You should see a clean DC line. If you do not, LO calibration failed or the CW tone detection missed.</li>
+    <li>Check <code>--fft-size</code> matches your expected Doppler resolution. At 192 kSps, an FFT of 19 200 gives 10 Hz/bin.</li>
+  </ul>
+
+  <h3>14.4 &mdash; GPSDO query fails at script start</h3>
+  <p>Scripts search for <code>query_gpsdo_sensors</code> in standard radioconda
+     paths. If your installation uses a different layout, edit
+     <code>_QUERY_GPSDO_PATHS</code> at the top of
+     <code>cv2x_capture_replay.py</code> or <code>cv2x_rfnoc_replay.py</code>.</p>
+
+  <h3>14.5 &mdash; Cyan overlay drifts off the tone in <code>tx_sanity.py</code></h3>
+  <p>The schedule sidecar or the TX timing is wrong. Do not proceed to the
+     full processing run &mdash; fix capture timing first. Most common cause
+     is running <code>cwhop_tx.py</code> without <code>--gpsdo</code>.</p>
+
+  <h3>14.6 &mdash; <code>cwhop_viewer.py</code> cache looks wrong</h3>
+  <p>Pass <code>--reprocess</code> to rebuild the <code>_10k.npz</code> cache.
+     Always do this after you edit any module or switch to a new config.</p>
+
+  <h3>14.7 &mdash; Simulator shows a clean butterfly but hardware doesn't</h3>
+  <p>The bug is not in the core de-hop math &mdash; the simulator exercises
+     that exact algorithm and it passes. Look at hardware-side problems:
+     GPSDO lock drift, TX/RX gain staging, LO leakage, antenna alignment,
+     replay underflows.</p>
+
+  <h3>14.8 &mdash; <code>cwhop_rx.py</code> produces a clean spectrogram but <code>cwhop_viewer.py</code> doesn't (or vice versa)</h3>
+  <p>The bug is likely in the block-processing / decimation layer of
+     <code>cwhop_rx.py</code>. The simulator's <code>dehop_and_stft.py</code>
+     is the reference implementation &mdash; if it looks right there, the
+     issue is in the memory-efficient hardware version of the same algorithm.</p>
+</section>
+
+<!-- ============================= 15. GOLDEN PATH ============================= -->
+<section id="golden-path">
+  <h2>15. Recommended first experiment (golden path)</h2>
+  <p>
+    One numbered list, top to bottom, from a fresh checkout to a published-ready
+    micro-Doppler spectrogram. Follow in order.
+  </p>
+
+  <ol>
+    <li>
+      <strong>Smoke-test the simulator.</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>cd multihop_and_cv2x_over_the_air_spectrogram_px/simulator
+python test_phase_continuity.py
+python test_dehop_pipeline.py</pre>
+      Confirm PASS on the first, a clean side-by-side butterfly on the second.
+      See <a href="#w0-sim">&sect;5</a>.
+    </li>
+
+    <li>
+      <strong>Tune parameters interactively.</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhopping_explorer.py</pre>
+      Find a combination that gives a high quality score. Note the window,
+      overlap, zero-pad, Doppler range values.
+    </li>
+
+    <li>
+      <strong>Mirror the tuned settings into the POST config file</strong>
+      (or edit a copy of it). See <a href="#config-ref">&sect;11</a> for field meanings.
+    </li>
+
+    <li>
+      <strong>Verify hardware.</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>uhd_usrp_probe <span class="flag">--args</span> <span class="str">"type=x300"</span></pre>
+      Confirm <code>gps_locked: true</code> and <code>ref_locked: true</code>.
+    </li>
+
+    <li>
+      <strong>Capture (20 s, 5.9 GHz, GPSDO).</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>cd ..
+python cwhop_tx.py <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--center-freq</span> 5.9e9 <span class="flag">--tx-gain</span> 20 <span class="flag">--rx-gain</span> 30 <span class="flag">\</span>
+    <span class="flag">--duration</span> 20 <span class="flag">--gpsdo</span> <span class="flag">\</span>
+    <span class="flag">--args</span> <span class="str">"serial=33767A5,master_clock_rate=184.32e6"</span> <span class="flag">\</span>
+    <span class="flag">--output</span> my_capture</pre>
+      See <a href="#w1-capture">&sect;6.1</a>.
+    </li>
+
+    <li>
+      <strong>Sanity-check the TX file.</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>python tx_sanity.py <span class="flag">--input</span> my_capture.cf32 <span class="flag">\</span>
+    <span class="flag">--sidecar</span> my_capture_schedule.json <span class="flag">--zoom-hz</span> 20000 <span class="flag">--chunk-ms</span> 5</pre>
+      Cyan schedule overlay must sit on top of the tone. See <a href="#w1-sanity">&sect;6.2</a>.
+    </li>
+
+    <li>
+      <strong>Explore the RX file interactively.</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_viewer.py <span class="flag">--input</span> my_capture_rx.cf32</pre>
+      Use the recommended starting settings (70 ms / hann / 80% / 4&times; /
+      40 dB / &plusmn;500 Hz / stitch ON). See <a href="#w1-viewer">&sect;6.3</a>.
+    </li>
+
+    <li>
+      <strong>Batch-export a paper figure.</strong>
+      <pre class="code"><button class="copy-btn" type="button">Copy</button>python cwhop_rx.py <span class="flag">--input</span> my_capture_rx.cf32 <span class="flag">\</span>
+    <span class="flag">--config</span> cwhopping_config_POST.json <span class="flag">\</span>
+    <span class="flag">--plot</span> <span class="flag">--save</span> <span class="flag">--doppler-range</span> 500 <span class="flag">--dynamic-range</span> 40</pre>
+      See <a href="#w1-batch">&sect;6.4</a>. Outputs
+      <code>*_plot.png</code>, <code>*_spectrogram.npz</code>,
+      <code>*_summary.json</code>.
+    </li>
+
+    <li>
+      <strong>Archive.</strong> Copy the <code>.cf32</code>, the sidecar JSONs,
+      the PNG, the NPZ, and the config file into a dated results folder.
+      Without the sidecar and config, nobody can reproduce the spectrogram.
+    </li>
+  </ol>
+
+  <div class="callout good">
+    <p><span class="tag">You are done</span>
+      If the exported PNG shows a micro-Doppler butterfly and the summary
+      JSON reports sensible STFT parameters, you have successfully run the
+      hopped-CW pipeline end to end. Graduate to
+      <a href="#w2-cv2x">Workflow&nbsp;2</a> and
+      <a href="#w3-virtsense">Workflow&nbsp;3</a> when you want data-carrying
+      C-V2X coexistence.</p>
+  </div>
+</section>
+
+<hr>
+
+<p style="color: var(--muted); font-size: 12.5px; margin-top: 40px;">
+  Manual derived from the in-repo READMEs and <code>ALL COMMANDS FOR PAPERS - ANNOTATED.txt</code>.
+  If a command here disagrees with the <code>.py</code> source, the source wins &mdash; file an issue.
+</p>
+
+</main>
+
+</div> <!-- /.layout -->
+
+<a href="#welcome" class="back-top" id="backTop" aria-label="Back to top">&uarr;</a>
+
+<script>
+(function () {
+  // Copy-to-clipboard on code blocks
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    var btn = pre.querySelector('.copy-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      // Clone the pre, strip the button, read the text
+      var clone = pre.cloneNode(true);
+      var b = clone.querySelector('.copy-btn');
+      if (b) b.remove();
+      var text = clone.innerText.replace(/\u00A0/g, ' ');
+      var done = function () {
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      } else {
+        // Fallback
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  // Back-to-top visibility
+  var backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 500) backTop.classList.add('visible');
+    else backTop.classList.remove('visible');
+  });
+
+  // Sidebar scroll-spy
+  var sidebar = document.getElementById('sidebar');
+  var sectionIds = Array.from(sidebar.querySelectorAll('a[href^="#"]'))
+    .map(function (a) { return a.getAttribute('href').slice(1); });
+  var sectionEls = sectionIds.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+
+  function setActive() {
+    var y = window.scrollY + 80;
+    var currentId = sectionEls[0] && sectionEls[0].id;
+    for (var i = 0; i < sectionEls.length; i++) {
+      if (sectionEls[i].offsetTop <= y) currentId = sectionEls[i].id;
+    }
+    sidebar.querySelectorAll('a').forEach(function (a) {
+      if (a.getAttribute('href') === '#' + currentId) a.classList.add('active');
+      else a.classList.remove('active');
+    });
+  }
+  window.addEventListener('scroll', setActive);
+  setActive();
+
+  // Mobile menu toggle
+  var menuBtn = document.querySelector('.menu-toggle');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('open');
+    });
+    sidebar.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A' && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

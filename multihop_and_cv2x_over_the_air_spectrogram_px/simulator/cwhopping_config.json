@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "transmitter": {
+    "dwell_ms": 100,
+    "hop_freqs_hz": [
+      7500.0,
+      15000.0,
+      22500.0,
+      30000.0
+    ],
+    "hop_sparsity": 1,
+    "taper_shape": "linear",
+    "taper_pct": 0.0,
+    "min_amplitude": 0.204,
+    "transition_mode": "step",
+    "gap_ms": 11,
+    "gap_jitter_ms": 100,
+    "A_cw": 1.0
+  },
+  "scfdma": {
+    "enabled": false,
+    "scenario": "Co-located, CW inside alloc",
+    "colocated_tx": true,
+    "cw_inside_alloc": true,
+    "data_activity": 0.973,
+    "num_subch_max": 18,
+    "data_power_dB": 14.2,
+    "spectral_isolation_dB": 23
+  },
+  "receiver": {
+    "stft_window_ms": 16,
+    "window_type": "blackman",
+    "overlap_pct": 95,
+    "zero_pad_factor": 4,
+    "per_dwell_window": false,
+    "blank_transitions": false,
+    "doppler_range_hz": 1826
+  },
+  "hardware": {
+    "Fs_hz": 30720000,
+    "center_freq_hz": 5900000000,
+    "bandwidth_hz": 20000000,
+    "num_sensing_bins": 1199,
+    "bin_spacing_hz": 7500,
+    "decimation_factor": 3072
+  }
+}
